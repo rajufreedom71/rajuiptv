@@ -6,6 +6,8 @@
     <title>Free IPTV by RAJU</title>
     <!-- Video.js CSS -->
     <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
+    <!-- Video.js Resolution Switcher CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/videojs-contrib-quality-levels@2.1.0/dist/videojs-contrib-quality-levels.css" rel="stylesheet">
     <!-- Google Fonts for Smart Typography -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
     <!-- FontAwesome for Zoom Style Arrows & Stars -->
@@ -32,11 +34,11 @@
             background: linear-gradient(135deg, #161b26, #090b10);
             padding: 16px 20px;
             text-align: center;
-            font-size: 26px; /* ফন্ট সাইজ বড় করা হয়েছে */
+            font-size: 26px;
             font-weight: 800;
             letter-spacing: 2px;
-            font-family: 'Montserrat', sans-serif; /* স্মার্ট মন্টসেরাট ফন্ট */
-            background: linear-gradient(to right, #ffe066, #f5b041); /* প্রিমিয়াম গোল্ডেন গ্রেডিয়েন্ট */
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(to right, #ffe066, #f5b041);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             text-shadow: 2px 4px 10px rgba(245, 176, 65, 0.2);
@@ -80,7 +82,7 @@
             height: 100% !important;
         }
         
-        /* Search Box Container (Top of sidebar now) */
+        /* Search Box Container */
         .search-box-container {
             padding: 15px;
             background-color: #1e2530;
@@ -234,6 +236,11 @@
             color: #ffcc00 !important;
         }
 
+        /* Custom Styles to ensure quality menu looks good */
+        .vjs-quality-selector .vjs-menu-button {
+            margin-right: 5px;
+        }
+
         /* Mobile Responsive Configurations */
         @media (max-width: 768px) {
             body {
@@ -275,14 +282,11 @@
 </head>
 <body>
 
-    <!-- প্রিমিয়াম ও আকর্ষণীয় থিম হেডার -->
     <header>📺 FREE IPTV BY RAJU</header>
 
     <div class="main-container">
         <!-- Sidebar Section -->
         <div class="playlist-section">
-            <!-- (নোট: আপনার রিকোয়েস্ট অনুযায়ী আগের চ্যানেল ক্যাটাগরি টেক্সট রিমুভ করা হয়েছে) -->
-            
             <!-- Zoom Style Search Bar -->
             <div class="search-box-container">
                 <i class="fa-solid fa-magnifying-glass search-icon"></i>
@@ -305,13 +309,42 @@
         </div>
     </div>
 
-    <!-- Video.js Scripts -->
+    <!-- Video.js and Essential Quality Plugins -->
     <script src="https://vjs.zencdn.net/7.20.3/video.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-quality-levels@2.1.0/dist/videojs-contrib-quality-levels.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/videojs-hls-quality-selector@3.5.0/dist/videojs-hls-quality-selector.min.js"></script>
 
     <script>
         const m3uUrl = 'https://raw.githubusercontent.com/rajufreedom71/rajuiptv/main/playlist.m3u';
         
         const player = videojs('my-video');
+        
+        // রেজুলুশন সিলেক্টর প্লাগইন চালু করা হলো
+        player.hlsQualitySelector({
+            displayCurrentQuality: true,
+        });
+
+        // মোবাইল স্ক্রিন অটো-রোটেট স্ক্রিপ্ট (Fullscreen Handler)
+        player.on('fullscreenchange', function() {
+            if (player.isFullscreen()) {
+                // ফুলস্ক্রিন হলে স্ক্রিন ল্যান্ডস্কেপ (আড়াআড়ি) হয়ে যাবে
+                if (screen.orientation && screen.orientation.lock) {
+                    screen.orientation.lock('landscape').catch(function(error) {
+                        console.log("Orientation lock ignored/failed: ", error);
+                    });
+                } else if (screen.lockOrientation) {
+                    screen.lockOrientation('landscape');
+                }
+            } else {
+                // ফুলস্ক্রিন থেকে বের হলে আবার সোজা (Portrait) হয়ে যাবে
+                if (screen.orientation && screen.orientation.unlock) {
+                    screen.orientation.unlock();
+                } else if (screen.unlockOrientation) {
+                    screen.unlockOrientation();
+                }
+            }
+        });
+
         const zoomSidebarContainer = document.getElementById('zoom-sidebar-container');
         const searchInput = document.getElementById('search-input');
 
@@ -384,12 +417,12 @@
 
             const shouldExpandAll = keyword !== "";
 
-            // ১. সবার উপরে "All Channels" ফোল্ডার
+            // ১. "All Channels" ফোল্ডার
             if (allChannels.length > 0 && !keyword) {
                 createCategorySection("🌐 All Channels", allChannels, false, "all-header");
             }
 
-            // ২. প্রিয় চ্যানেলগুলোর (Favorites) ফোল্ডার
+            // ২. Favorites ফোল্ডার
             if (favChannels.length > 0) {
                 const filteredFavs = favChannels.filter(c => c.name.toLowerCase().includes(keyword));
                 if (filteredFavs.length > 0 || !keyword) {
@@ -397,7 +430,7 @@
                 }
             }
 
-            // ৩. বাকি সব ক্যাটাগরি নিচে থাকবে
+            // ৩. বাকি ক্যাটাগরিগুলো
             Object.keys(groupedChannels).forEach(categoryName => {
                 if (groupedChannels[categoryName].length > 0) {
                     createCategorySection(categoryName, groupedChannels[categoryName], shouldExpandAll);
