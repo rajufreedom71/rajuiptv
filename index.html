@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live TV Pro - Watch Online</title>
+    <title>রাজু'র ফ্রি আইপি টিভি</title>
     <!-- Video.js CSS -->
     <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
     <!-- FontAwesome for Zoom Style Arrows & Stars -->
@@ -243,7 +243,8 @@
 </head>
 <body>
 
-    <header>📺 LIVE TV PRO</header>
+    <!-- 'রাজু'র ফ্রি আইপি টিভি' নাম এখানে নিখুঁতভাবে দেওয়া হয়েছে -->
+    <header>📺 রাজু'র ফ্রি আইপি টিভি</header>
 
     <div class="main-container">
         <!-- Sidebar Section -->
@@ -322,10 +323,8 @@
 
                 countElement.innerText = allChannels.length;
 
-                // প্রথমবার ডাটা রেন্ডার করা
                 renderSidebar();
 
-                // সার্চ ইনপুটের ইভেন্ট লিসেনার
                 searchInput.addEventListener('input', () => {
                     renderSidebar(searchInput.value.trim());
                 });
@@ -336,19 +335,14 @@
             }
         }
 
-        // সাইডবার জেনারেট এবং ফিল্টার করার মেইন ফাংশন
         function renderSidebar(filterKeyword = "") {
             zoomSidebarContainer.innerHTML = '';
             const keyword = filterKeyword.toLowerCase();
 
-            // ১. ফেভারিট চ্যানেলের তালিকা আলাদা করা
             const favChannels = allChannels.filter(c => favoriteChannelUrls.includes(c.url));
-            
-            // ২. সাধারণ ক্যাটাগরি ভিত্তিক অবজেক্ট সাজানো
             const groupedChannels = {};
             
             allChannels.forEach(channel => {
-                // যদি সার্চ কীওয়ার্ড থাকে এবং চ্যানেলের নামের সাথে না মেলে, তবে বাদ যাবে
                 if (keyword && !channel.name.toLowerCase().includes(keyword)) {
                     return;
                 }
@@ -359,20 +353,15 @@
                 groupedChannels[channel.category].push(channel);
             });
 
-            // --- প্রথমে ফেভারিট ফোল্ডার রেন্ডার করা (যদি কোনো ফেভারিট চ্যানেল থাকে অথবা সার্চ খালি থাকে) ---
             if (favChannels.length > 0) {
-                // সার্চ চালু থাকলে ফেভারিটকেও ফিল্টার করা
                 const filteredFavs = favChannels.filter(c => c.name.toLowerCase().includes(keyword));
-                
                 if (filteredFavs.length > 0 || !keyword) {
                     createCategorySection("⭐ Favorites", filteredFavs, true);
                 }
             }
 
-            // --- তারপর বাকি সাধারণ ক্যাটাগরিগুলো রেন্ডার করা ---
             Object.keys(groupedChannels).forEach(categoryName => {
                 if (groupedChannels[categoryName].length > 0) {
-                    // যদি সার্চ বক্সে কিছু লেখা থাকে, তবে সব ক্যাটাগরি ফোল্ডার শুরুতেই ওপেন (Expanded) দেখাবে
                     const shouldExpand = keyword !== ""; 
                     createCategorySection(categoryName, groupedChannels[categoryName], shouldExpand);
                 }
@@ -383,7 +372,6 @@
             }
         }
 
-        // একটি নির্দিষ্ট ক্যাটাগরি ও তার ভেতরের চ্যানেল তৈরি করার হেল্পার ফাংশন
         function createCategorySection(categoryName, channels, isExpandedByDefault = false) {
             const headerBtn = document.createElement('button');
             headerBtn.className = 'zoom-category-header';
@@ -404,7 +392,6 @@
                 const li = document.createElement('li');
                 li.className = 'channel-item';
                 
-                // বর্তমানে কোনো চ্যানেল প্লে হচ্ছে কি না চেক করা
                 if (player.src() === channel.url) {
                     li.classList.add('active');
                 }
@@ -420,9 +407,7 @@
                     </button>
                 `;
 
-                // চ্যানেলে ক্লিক ইভেন্ট
                 li.addEventListener('click', (e) => {
-                    // যদি স্টারে ক্লিক না করা হয়ে থাকে, তবেই চ্যানেল প্লে হবে
                     if (e.target.closest('.fav-star-btn')) return;
 
                     document.querySelectorAll('.channel-item').forEach(el => el.classList.remove('active'));
@@ -432,29 +417,22 @@
                     player.play();
                 });
 
-                // স্টার/ফেভারিট বাটনের ক্লিক ইভেন্ট
                 const starBtn = li.querySelector('.fav-star-btn');
                 starBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     
                     if (favoriteChannelUrls.includes(channel.url)) {
-                        // অলরেডি থাকলে রিমুভ করব
                         favoriteChannelUrls = favoriteChannelUrls.filter(url => url !== channel.url);
                     } else {
-                        // না থাকলে অ্যাড করব
                         favoriteChannelUrls.push(channel.url);
                     }
                     
-                    // ব্রাউজার মেমরিতে (LocalStorage) সেভ রাখা যাতে পেজ রিফ্রেশ করলেও ফেভারিট না হারায়
                     localStorage.setItem('fav_channels', JSON.stringify(favoriteChannelUrls));
-                    
-                    // সাইডবার রি-রেন্ডার করা
                     renderSidebar(searchInput.value.trim());
                 });
 
                 subListUl.appendChild(li);
 
-                // প্রথমবার পেজ লোড হলে একদম প্রথম ক্যাটাগরির প্রথম চ্যানেল লোড করা (যদি প্লেয়ার সম্পূর্ণ খালি থাকে)
                 if (player.src() === "" && !isExpandedByDefault) {
                     li.classList.add('active');
                     player.src({ src: channel.url, type: 'application/x-mpegURL' });
