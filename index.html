@@ -6,7 +6,8 @@
     <title>Live TV Pro - Watch Online</title>
     <!-- Video.js CSS -->
     <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
-    <!-- Custom Styling for Premium Look -->
+    <!-- FontAwesome for Icons like Zoom -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
         * {
             box-sizing: border-box;
@@ -56,7 +57,7 @@
             display: flex;
             flex-direction: column;
             max-width: 400px;
-            min-width: 300px;
+            min-width: 320px;
         }
         .playlist-header {
             padding: 15px;
@@ -66,28 +67,53 @@
             color: #00ffcc;
             border-bottom: 1px solid #2e384e;
         }
-        /* Category Filter Styling */
-        .category-box {
-            padding: 10px 15px;
+        
+        /* Zoom Style Category Tabs */
+        .zoom-tabs-container {
             background-color: #1e2530;
-            border-bottom: 1px solid #2e384e;
-        }
-        .category-select {
-            width: 100%;
             padding: 10px;
+            border-bottom: 1px solid #2e384e;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        /* Custom scrollbar for tabs */
+        .zoom-tabs-container::-webkit-scrollbar {
+            height: 4px;
+        }
+        .zoom-tabs-container::-webkit-scrollbar-thumb {
+            background: #2e384e;
+            border-radius: 10px;
+        }
+
+        .zoom-tab {
             background-color: #242c3d;
-            color: #00ffcc;
-            border: 1px solid #2e384e;
-            border-radius: 5px;
-            font-size: 14px;
-            font-weight: bold;
-            outline: none;
+            color: #b3c2d4;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
         }
-        .category-select option {
-            background-color: #1a1f29;
-            color: #fff;
+        .zoom-tab i {
+            font-size: 14px;
         }
+        .zoom-tab:hover {
+            background-color: #2e384e;
+            color: #ffffff;
+        }
+        .zoom-tab.active {
+            background-color: #0e71eb; /* Zoom Blue color */
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(14, 113, 235, 0.4);
+        }
+
         .channel-list {
             overflow-y: auto;
             flex: 1;
@@ -114,7 +140,7 @@
         .channel-icon {
             width: 30px;
             height: 30px;
-            border-radius: 50%;
+            border-radius: 8px; /* Square with round corners like Zoom icons */
             background-color: #2e384e;
             margin-right: 12px;
             display: flex;
@@ -154,7 +180,7 @@
         <div class="player-section">
             <video id="my-video" class="video-js vjs-default-skin vjs-big-play-centered" controls autoplay preload="auto" data-setup="{}">
                 <p class="vjs-no-js">
-                    To view this video please enable JavaScript, and consider upgrading to a web browser that supports HTML5 video
+                    To view this video please enable JavaScript
                 </p>
             </video>
         </div>
@@ -163,11 +189,11 @@
         <div class="playlist-section">
             <div class="playlist-header">চ্যানেল সমূহ (<span id="count">0</span>)</div>
             
-            <!-- Category Filter Dropdown -->
-            <div class="category-box">
-                <select class="category-select" id="category-select">
-                    <option value="all">সব ক্যাটাগরি (All Categories)</option>
-                </select>
+            <!-- Zoom Style Horizontal Navigation Tabs -->
+            <div class="zoom-tabs-container" id="zoom-tabs">
+                <button class="zoom-tab active" data-category="all">
+                    <i class="fa-solid fa-grid-22"></i> সব (All)
+                </button>
             </div>
 
             <ul class="channel-list" id="channel-list">
@@ -180,17 +206,15 @@
     <script src="https://vjs.zencdn.net/7.20.3/video.js"></script>
 
     <script>
-        // আপনার গিটহাবের র (Raw) প্লেলিস্ট লিংক
         const m3uUrl = 'https://raw.githubusercontent.com/rajufreedom71/rajuiptv/main/playlist.m3u';
         
         const player = videojs('my-video');
         const channelListElement = document.getElementById('channel-list');
         const countElement = document.getElementById('count');
-        const categorySelectElement = document.getElementById('category-select');
+        const zoomTabsContainer = document.getElementById('zoom-tabs');
 
-        let allChannels = []; // সব চ্যানেল জমা রাখার জন্য
+        let allChannels = [];
 
-        // M3U ফাইলটি রিড এবং পার্স করার ফাংশন
         async function fetchAndParseM3U() {
             try {
                 const response = await fetch(m3uUrl);
@@ -204,14 +228,12 @@
                     const line = lines[i].trim();
                     
                     if (line.startsWith('#EXTINF:')) {
-                        // গ্রুপ/ক্যাটাগরি নাম বের করা
-                        let category = "Uncategorized";
+                        let category = "General";
                         const groupMatch = line.match(/group-title="([^"]+)"/);
                         if (groupMatch && groupMatch[1]) {
                             category = groupMatch[1];
                         }
 
-                        // চ্যানেলের নাম খুঁজে বের করা (কমা এর পরের অংশ)
                         const nameIndex = line.lastIndexOf(',');
                         let name = "Unknown Channel";
                         if (nameIndex !== -1) {
@@ -227,10 +249,10 @@
                     }
                 }
 
-                // ক্যাটাগরি ড্রপডাউন তৈরি করা
-                setupCategories(allChannels);
+                // জুম স্টাইলের ট্যাব মেনু তৈরি করা
+                createZoomTabs(allChannels);
                 
-                // শুরুতে সব চ্যানেল দেখানো
+                // শুরুতে সব চ্যানেল শো করা
                 displayChannels(allChannels);
                 
             } catch (error) {
@@ -239,33 +261,44 @@
             }
         }
 
-        // ক্যাটাগরি ড্রপডাউন মেনু সাজানোর ফাংশন
-        function setupCategories(channels) {
+        // Zoom Style Tabs জেনারেট করার ফাংশন
+        function createZoomTabs(channels) {
             const categories = new Set();
             channels.forEach(channel => {
                 if(channel.category) categories.add(channel.category);
             });
 
+            // প্রতিটি ইউনিক ক্যাটাগরির জন্য একটি করে সুন্দর বাটন তৈরি
             categories.forEach(category => {
-                const option = document.createElement('option');
-                option.value = category;
-                option.innerText = category;
-                categorySelectElement.appendChild(option);
+                const btn = document.createElement('button');
+                btn.className = 'zoom-tab';
+                btn.setAttribute('data-category', category);
+                
+                // জুম অ্যাপের মতো আইকন সেট করা (টিভি বা লিস্ট আইকন)
+                btn.innerHTML = `<i class="fa-solid fa-tv"></i> ${category}`;
+                zoomTabsContainer.appendChild(btn);
             });
 
-            // ড্রপডাউন চেঞ্জ করার ইভেন্ট লিসেনার
-            categorySelectElement.addEventListener('change', (e) => {
-                const selectedCategory = e.target.value;
-                if (selectedCategory === 'all') {
-                    displayChannels(allChannels);
-                } else {
-                    const filtered = allChannels.filter(c => c.category === selectedCategory);
-                    displayChannels(filtered);
-                }
+            // ট্যাব ক্লিকের ইভেন্ট হ্যান্ডলার
+            const tabs = document.querySelectorAll('.zoom-tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // আগের অ্যাক্টিভ ট্যাব রিমুভ করে নতুনটায় সেট করা
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+
+                    const selectedCategory = tab.getAttribute('data-category');
+                    
+                    if (selectedCategory === 'all') {
+                        displayChannels(allChannels);
+                    } else {
+                        const filtered = allChannels.filter(c => c.category === selectedCategory);
+                        displayChannels(filtered);
+                    }
+                });
             });
         }
 
-        // ওয়েবসাইটে চ্যানেলের তালিকা দেখানোর ফাংশন
         function displayChannels(channels) {
             channelListElement.innerHTML = '';
             countElement.innerText = channels.length;
@@ -279,7 +312,6 @@
                 const li = document.createElement('li');
                 li.className = 'channel-item';
                 
-                // প্রথম অক্ষরের আইকন তৈরি
                 const firstLetter = channel.name.charAt(0).toUpperCase();
                 
                 li.innerHTML = `
@@ -287,7 +319,6 @@
                     <div>${channel.name}</div>
                 `;
 
-                // চ্যানেলে ক্লিক করলে প্লে হওয়ার ইভেন্ট
                 li.addEventListener('click', () => {
                     document.querySelectorAll('.channel-item').forEach(el => el.classList.remove('active'));
                     li.classList.add('active');
@@ -301,7 +332,6 @@
 
                 channelListElement.appendChild(li);
 
-                // প্রথম চ্যানেলটি ডিফল্ট হিসেবে প্লেয়ারে সেট করে রাখা (শুধু শুরুর জন্য)
                 if (index === 0 && player.src() === "") {
                     li.classList.add('active');
                     player.src({
@@ -312,7 +342,6 @@
             });
         }
 
-        // পেজ লোড হলে ফাংশনটি রান করবে
         window.onload = fetchAndParseM3U;
     </script>
 </body>
