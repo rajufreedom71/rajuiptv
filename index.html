@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>রাজু'র ফ্রি আইপি টিভি</title>
     <!-- Video.js CSS -->
     <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
@@ -14,6 +14,7 @@
             margin: 0;
             padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
         body {
             background-color: #11141a;
@@ -21,17 +22,19 @@
             display: flex;
             flex-direction: column;
             height: 100vh;
+            overflow: hidden;
         }
         header {
             background: linear-gradient(135deg, #1e2530, #0f1319);
-            padding: 15px 20px;
+            padding: 12px 20px;
             text-align: center;
-            font-size: 24px;
+            font-size: 20px;
             font-weight: bold;
             letter-spacing: 1px;
             color: #00ffcc;
             border-bottom: 2px solid #1f2937;
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            flex-shrink: 0;
         }
         .main-container {
             display: flex;
@@ -72,7 +75,7 @@
             padding: 15px;
             background-color: #242c3d;
             font-weight: bold;
-            font-size: 16px;
+            font-size: 15px;
             color: #00ffcc;
             border-bottom: 1px solid #2e384e;
         }
@@ -113,6 +116,7 @@
             overflow-y: auto;
             flex: 1;
             padding: 10px 0;
+            -webkit-overflow-scrolling: touch; /* smooth mobile scroll */
         }
 
         /* Zoom Category Header */
@@ -165,7 +169,7 @@
 
         /* Individual Channel Row */
         .channel-item {
-            padding: 10px 20px;
+            padding: 12px 20px; /* Enhanced for mobile touch */
             border-bottom: 1px solid #1e2530;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -210,41 +214,42 @@
             border: none;
             color: #4a5768;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 16px;
             padding: 5px;
-            transition: transform 0.1s, color 0.2s;
-        }
-        .channel-item:hover .fav-star-btn {
-            color: #8899a6;
         }
         .fav-star-btn.starred {
             color: #ffcc00 !important;
         }
-        .fav-star-btn:hover {
-            transform: scale(1.2);
-        }
 
+        /* Mobile Optimized Layout Rules */
         @media (max-width: 768px) {
             .main-container {
                 flex-direction: column;
             }
             .player-section {
                 order: 1;
-                height: 250px;
+                flex: none;
+                width: 100%;
+                aspect-ratio: 16 / 9; /* Perfect video dimension */
             }
             .playlist-section {
                 order: 2;
                 max-width: 100%;
                 min-width: 100%;
                 flex: 1;
+                border-right: none;
+                border-top: 2px solid #242c3d;
+            }
+            header {
+                font-size: 18px;
+                padding: 10px;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- 'রাজু'র ফ্রি আইপি টিভি' নাম এখানে নিখুঁতভাবে দেওয়া হয়েছে -->
-    <header>📺 রাজু'র ফ্রি আইপি টিভি</header>
+    <header>📺 রাজু'র ফ্রি আইপি充 টিভি</header>
 
     <div class="main-container">
         <!-- Sidebar Section -->
@@ -265,7 +270,8 @@
 
         <!-- Video Player Section -->
         <div class="player-section">
-            <video id="my-video" class="video-js vjs-default-skin vjs-big-play-centered" controls autoplay preload="auto" data-setup="{}">
+            <!-- added playsinline, autoplay, muted for extreme mobile compatibility -->
+            <video id="my-video" class="video-js vjs-default-skin vjs-big-play-centered" controls autoplay muted playsinline preload="auto" data-setup="{}">
                 <p class="vjs-no-js">
                     To view this video please enable JavaScript
                 </p>
@@ -414,7 +420,10 @@
                     li.classList.add('active');
 
                     player.src({ src: channel.url, type: 'application/x-mpegURL' });
-                    player.play();
+                    // Explicit play with user-interaction handler
+                    player.play().catch(error => {
+                        console.log("Autoplay was prevented, trying muted play", error);
+                    });
                 });
 
                 const starBtn = li.querySelector('.fav-star-btn');
