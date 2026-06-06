@@ -1,50 +1,86 @@
-<script>
-    const m3uUrl = 'https://raw.githubusercontent.com/rajufreedom71/rajuiptv/main/playlist.m3u';
-    let player = videojs('my-video');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free IPTV by RAJU</title>
+    <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
+    <style>
+        :root { --bg: #0f172a; --sidebar: #1e293b; --accent: #fbbf24; --text: #f1f5f9; }
+        body { margin: 0; background: var(--bg); color: var(--text); display: flex; height: 100vh; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+        #sidebar { width: 350px; background: var(--sidebar); border-right: 2px solid #334155; overflow-y: auto; }
+        .cat-header { padding: 15px; cursor: pointer; background: #334155; border-bottom: 1px solid #475569; display: flex; justify-content: space-between; font-weight: bold; color: var(--accent); }
+        .channel-list { display: none; background: #0f172a; }
+        .channel-list.show { display: block; }
+        .channel-item { padding: 12px 20px; cursor: pointer; border-bottom: 1px solid #1e293b; transition: 0.3s; }
+        .channel-item:hover { background: #334155; color: var(--accent); padding-left: 30px; }
+        .player-container { flex: 1; display: flex; align-items: center; justify-content: center; background: black; }
+        .video-js { width: 100% !important; height: 100% !important; }
+    </style>
+</head>
+<body>
 
-    async function init() {
+<div id="sidebar">Loading...</div>
+<div class="player-container">
+    <video id="player" class="video-js vjs-big-play-centered" controls autoplay playsinline></video>
+</div>
+
+<script src="https://vjs.zencdn.net/7.20.3/video.js"></script>
+<script>
+    const player = videojs('player');
+    const sidebar = document.getElementById('sidebar');
+    // প্রক্সি ব্যবহার করা হয়েছে যাতে গিটহাবের ফাইল সরাসরি লোড হয়
+    const url = 'https://corsproxy.io/?https://raw.githubusercontent.com/rajufreedom71/rajuiptv/main/playlist.m3u';
+
+    async function load() {
         try {
-            const response = await fetch(m3uUrl);
-            const text = await response.text();
+            const res = await fetch(url);
+            const text = await res.text();
             const lines = text.split('\n');
-            const sidebar = document.getElementById('sidebar');
             sidebar.innerHTML = '';
             
-            let currentCategory = "";
-
+            let groups = { "All Channels": [] };
+            
             for (let i = 0; i < lines.length; i++) {
-                if (lines[i].startsWith('#EXTINF:')) {
-                    // ক্যাটাগরি চেক - যদি না থাকে তবে ডিফল্ট হিসেবে ধরবে
-                    const groupMatch = lines[i].match(/group-title="([^"]+)"/);
-                    const category = groupMatch ? groupMatch[1] : "Channels";
+                if (lines[i].startsWith('#EXTINF')) {
+                    let groupMatch = lines[i].match(/group-title="([^"]+)"/);
+                    let group = groupMatch ? groupMatch[1] : "Others";
+                    if (!groups[group]) groups[group] = [];
                     
-                    if (category !== currentCategory) {
-                        currentCategory = category;
-                        let catDiv = document.createElement('div');
-                        catDiv.className = 'zoom-category-header';
-                        catDiv.style.cssText = "background: #242c3d; padding: 10px; color: #f5b041; border-top: 1px solid #333;";
-                        catDiv.innerHTML = `📁 ${category}`;
-                        sidebar.appendChild(catDiv);
-                    }
-
-                    // চ্যানেলের নাম এবং লিঙ্ক
-                    const name = lines[i].split(',')[1] || "Unnamed Channel";
-                    const url = lines[i+1];
-                    if (url && url.startsWith('http')) {
-                        let chDiv = document.createElement('div');
-                        chDiv.className = 'channel-item';
-                        chDiv.innerHTML = name;
-                        chDiv.onclick = () => { 
-                            player.src({src: url, type: 'application/x-mpegURL'}); 
-                            player.play(); 
-                        };
-                        sidebar.appendChild(chDiv);
+                    let name = lines[i].split(',')[1];
+                    let link = lines[i+1];
+                    if (link) {
+                        groups[group].push({ name, link });
+                        groups["All Channels"].push({ name, link });
                     }
                 }
             }
-        } catch (e) {
-            document.getElementById('sidebar').innerHTML = "Failed to load list!";
+
+            for (let group in groups) {
+                let header = document.createElement('div');
+                header.className = 'cat-header';
+                header.innerHTML = `<span>📁 ${group}</span><span>▼</span>`;
+                
+                let list = document.createElement('div');
+                list.className = 'channel-list';
+                
+                groups[group].forEach(ch => {
+                    let item = document.createElement('div');
+                    item.className = 'channel-item';
+                    item.textContent = ch.name;
+                    item.onclick = () => { player.src({src: ch.link, type: 'application/x-mpegURL'}); player.play(); };
+                    list.appendChild(item);
+                });
+
+                header.onclick = () => list.classList.toggle('show');
+                sidebar.appendChild(header);
+                sidebar.appendChild(list);
+            }
+        } catch(e) {
+            sidebar.innerHTML = "Error! Reload again.";
         }
     }
-    init();
+    load();
 </script>
+</body>
+</html>
