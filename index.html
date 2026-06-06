@@ -6,7 +6,7 @@
     <title>Live TV Pro - Watch Online</title>
     <!-- Video.js CSS -->
     <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
-    <!-- FontAwesome for Zoom Style Arrows -->
+    <!-- FontAwesome for Zoom Style Arrows & Stars -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
         * {
@@ -37,19 +37,19 @@
             display: flex;
             flex: 1;
             overflow: hidden;
-            flex-direction: row; /* এটি নিশ্চিত করে যে সাইডবার বামে থাকবে */
+            flex-direction: row;
         }
         
-        /* Sidebar Section (Moved to the LEFT) */
+        /* Sidebar Section (LEFT) */
         .playlist-section {
             flex: 1;
             background-color: #1a1f29;
-            border-right: 2px solid #242c3d; /* ডান পাশে বর্ডার */
+            border-right: 2px solid #242c3d;
             display: flex;
             flex-direction: column;
             max-width: 400px;
             min-width: 320px;
-            order: 1; /* বামে রাখার জন্য অর্ডার ১ */
+            order: 1;
         }
         
         /* Video Player Section */
@@ -60,7 +60,7 @@
             justify-content: center;
             align-items: center;
             position: relative;
-            order: 2; /* ডানে রাখার জন্য অর্ডার ২ */
+            order: 2;
         }
         
         .video-js {
@@ -77,14 +77,45 @@
             border-bottom: 1px solid #2e384e;
         }
         
-        /* Zoom Workplace Style Nested Sidebar Container */
+        /* Search Box Styling like Zoom */
+        .search-box-container {
+            padding: 10px 15px;
+            background-color: #1e2530;
+            border-bottom: 1px solid #2e384e;
+            position: relative;
+        }
+        .search-input {
+            width: 100%;
+            padding: 8px 12px 8px 35px;
+            background-color: #242c3d;
+            border: 1px solid #2e384e;
+            border-radius: 6px;
+            color: #ffffff;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .search-input:focus {
+            border-color: #0e71eb;
+        }
+        .search-icon {
+            position: absolute;
+            left: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8899a6;
+            font-size: 13px;
+            pointer-events: none;
+        }
+
+        /* Sidebar Scrollable Area */
         .zoom-sidebar {
             overflow-y: auto;
             flex: 1;
             padding: 10px 0;
         }
 
-        /* Zoom Accordion Category Header */
+        /* Zoom Category Header */
         .zoom-category-header {
             width: 100%;
             background: transparent;
@@ -104,13 +135,11 @@
             background-color: #242c3d;
             color: #ffffff;
         }
-        /* Arrow icon style */
         .zoom-category-header i.arrow {
             font-size: 12px;
             transition: transform 0.2s ease;
             width: 12px;
         }
-        /* When expanded, rotate arrow down */
         .zoom-category-header.expanded {
             color: #ffffff;
         }
@@ -118,19 +147,23 @@
             transform: rotate(90deg);
         }
 
-        /* Channel Sub-list (Hidden by default) */
+        /* Favorites Folder Unique Header Color */
+        .fav-header {
+            color: #ffcc00 !important;
+        }
+
+        /* Channel Sub-list */
         .zoom-channel-sublist {
             list-style: none;
             display: none;
             background-color: #151922;
-            padding-left: 15px; /* Nested look like Zoom */
+            padding-left: 15px;
         }
-        /* Show when active */
         .zoom-channel-sublist.show {
             display: block;
         }
 
-        /* Individual Channel Styling inside Category */
+        /* Individual Channel Row */
         .channel-item {
             padding: 10px 20px;
             border-bottom: 1px solid #1e2530;
@@ -140,13 +173,14 @@
             align-items: center;
             font-size: 13px;
             color: #cbd5e1;
+            position: relative;
         }
         .channel-item:hover {
             background-color: #242c3d;
             color: #00ffcc;
         }
         .channel-item.active {
-            background-color: #0e71eb; /* Zoom Premium Blue Selection */
+            background-color: #0e71eb;
             color: #ffffff;
             font-weight: bold;
         }
@@ -168,17 +202,38 @@
             color: #ffffff;
         }
 
-        /* Responsive design for Mobile */
+        /* Favorite Star Button Style */
+        .fav-star-btn {
+            position: absolute;
+            right: 20px;
+            background: transparent;
+            border: none;
+            color: #4a5768;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 5px;
+            transition: transform 0.1s, color 0.2s;
+        }
+        .channel-item:hover .fav-star-btn {
+            color: #8899a6;
+        }
+        .fav-star-btn.starred {
+            color: #ffcc00 !important;
+        }
+        .fav-star-btn:hover {
+            transform: scale(1.2);
+        }
+
         @media (max-width: 768px) {
             .main-container {
                 flex-direction: column;
             }
             .player-section {
-                order: 1; /* মোবাইলে ভিডিও প্লেয়ার উপরে থাকবে */
+                order: 1;
                 height: 250px;
             }
             .playlist-section {
-                order: 2; /* মোবাইলে সাইডবার নিচে থাকবে */
+                order: 2;
                 max-width: 100%;
                 min-width: 100%;
                 flex: 1;
@@ -191,17 +246,23 @@
     <header>📺 LIVE TV PRO</header>
 
     <div class="main-container">
-        <!-- Sidebar Section (Left side) -->
+        <!-- Sidebar Section -->
         <div class="playlist-section">
             <div class="playlist-header">চ্যানেল ক্যাটাগরি (<span id="count">0</span>)</div>
             
-            <!-- Zoom Style Vertical Accordion Container -->
+            <!-- Zoom Style Search Bar -->
+            <div class="search-box-container">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="search-input" class="search-input" placeholder="চ্যানেল খুঁজুন (Search channels...)" />
+            </div>
+            
+            <!-- Sidebar Vertical Container -->
             <div class="zoom-sidebar" id="zoom-sidebar-container">
-                <!-- Dynamic categories and channels will load here -->
+                <!-- Data will load here dynamically -->
             </div>
         </div>
 
-        <!-- Video Player Section (Right side) -->
+        <!-- Video Player Section -->
         <div class="player-section">
             <video id="my-video" class="video-js vjs-default-skin vjs-big-play-centered" controls autoplay preload="auto" data-setup="{}">
                 <p class="vjs-no-js">
@@ -220,8 +281,10 @@
         const player = videojs('my-video');
         const zoomSidebarContainer = document.getElementById('zoom-sidebar-container');
         const countElement = document.getElementById('count');
+        const searchInput = document.getElementById('search-input');
 
         let allChannels = [];
+        let favoriteChannelUrls = JSON.parse(localStorage.getItem('fav_channels')) || [];
 
         async function fetchAndParseM3U() {
             try {
@@ -259,15 +322,13 @@
 
                 countElement.innerText = allChannels.length;
 
-                const groupedChannels = {};
-                allChannels.forEach(channel => {
-                    if (!groupedChannels[channel.category]) {
-                        groupedChannels[channel.category] = [];
-                    }
-                    groupedChannels[channel.category].push(channel);
-                });
+                // প্রথমবার ডাটা রেন্ডার করা
+                renderSidebar();
 
-                renderZoomSidebar(groupedChannels);
+                // সার্চ ইনপুটের ইভেন্ট লিসেনার
+                searchInput.addEventListener('input', () => {
+                    renderSidebar(searchInput.value.trim());
+                });
                 
             } catch (error) {
                 console.error('Error loading M3U file:', error);
@@ -275,72 +336,146 @@
             }
         }
 
-        function renderZoomSidebar(groupedData) {
+        // সাইডবার জেনারেট এবং ফিল্টার করার মেইন ফাংশন
+        function renderSidebar(filterKeyword = "") {
             zoomSidebarContainer.innerHTML = '';
+            const keyword = filterKeyword.toLowerCase();
 
-            let isFirstChannelSet = false;
-
-            Object.keys(groupedData).forEach((categoryName, catIndex) => {
+            // ১. ফেভারিট চ্যানেলের তালিকা আলাদা করা
+            const favChannels = allChannels.filter(c => favoriteChannelUrls.includes(c.url));
+            
+            // ২. সাধারণ ক্যাটাগরি ভিত্তিক অবজেক্ট সাজানো
+            const groupedChannels = {};
+            
+            allChannels.forEach(channel => {
+                // যদি সার্চ কীওয়ার্ড থাকে এবং চ্যানেলের নামের সাথে না মেলে, তবে বাদ যাবে
+                if (keyword && !channel.name.toLowerCase().includes(keyword)) {
+                    return;
+                }
                 
-                const headerBtn = document.createElement('button');
-                headerBtn.className = 'zoom-category-header';
-                headerBtn.innerHTML = `<i class="fa-solid fa-chevron-right arrow"></i> <i class="fa-regular fa-folder"></i> ${categoryName} (${groupedData[categoryName].length})`;
-                
-                const subListUl = document.createElement('ul');
-                subListUl.className = 'zoom-channel-sublist';
-
-                groupedData[categoryName].forEach((channel) => {
-                    const li = document.createElement('li');
-                    li.className = 'channel-item';
-                    
-                    const firstLetter = channel.name.charAt(0).toUpperCase();
-                    li.innerHTML = `
-                        <div class="channel-icon">${firstLetter}</div>
-                        <div>${channel.name}</div>
-                    `;
-
-                    li.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        document.querySelectorAll('.channel-item').forEach(el => el.classList.remove('active'));
-                        li.classList.add('active');
-
-                        player.src({
-                            src: channel.url,
-                            type: 'application/x-mpegURL'
-                        });
-                        player.play();
-                    });
-
-                    subListUl.appendChild(li);
-
-                    if (!isFirstChannelSet) {
-                        li.classList.add('active');
-                        player.src({
-                            src: channel.url,
-                            type: 'application/x-mpegURL'
-                        });
-                        
-                        headerBtn.classList.add('expanded');
-                        subListUl.classList.add('show');
-                        isFirstChannelSet = true;
-                    }
-                });
-
-                headerBtn.addEventListener('click', () => {
-                    const isExpanded = headerBtn.classList.contains('expanded');
-
-                    if (isExpanded) {
-                        headerBtn.classList.remove('expanded');
-                        subListUl.classList.remove('show');
-                    } else {
-                        headerBtn.classList.add('expanded');
-                        subListUl.classList.add('show');
-                    }
-                });
-
-                zoomSidebarContainer.appendChild(headerBtn);
-                zoomSidebarContainer.appendChild(subListUl);
+                if (!groupedChannels[channel.category]) {
+                    groupedChannels[channel.category] = [];
+                }
+                groupedChannels[channel.category].push(channel);
             });
+
+            // --- প্রথমে ফেভারিট ফোল্ডার রেন্ডার করা (যদি কোনো ফেভারিট চ্যানেল থাকে অথবা সার্চ খালি থাকে) ---
+            if (favChannels.length > 0) {
+                // সার্চ চালু থাকলে ফেভারিটকেও ফিল্টার করা
+                const filteredFavs = favChannels.filter(c => c.name.toLowerCase().includes(keyword));
+                
+                if (filteredFavs.length > 0 || !keyword) {
+                    createCategorySection("⭐ Favorites", filteredFavs, true);
+                }
+            }
+
+            // --- তারপর বাকি সাধারণ ক্যাটাগরিগুলো রেন্ডার করা ---
+            Object.keys(groupedChannels).forEach(categoryName => {
+                if (groupedChannels[categoryName].length > 0) {
+                    // যদি সার্চ বক্সে কিছু লেখা থাকে, তবে সব ক্যাটাগরি ফোল্ডার শুরুতেই ওপেন (Expanded) দেখাবে
+                    const shouldExpand = keyword !== ""; 
+                    createCategorySection(categoryName, groupedChannels[categoryName], shouldExpand);
+                }
+            });
+
+            if (zoomSidebarContainer.children.length === 0) {
+                zoomSidebarContainer.innerHTML = '<div style="padding: 20px; color: #888; text-align: center;">কোনো চ্যানেল পাওয়া যায়নি!</div>';
+            }
+        }
+
+        // একটি নির্দিষ্ট ক্যাটাগরি ও তার ভেতরের চ্যানেল তৈরি করার হেল্পার ফাংশন
+        function createCategorySection(categoryName, channels, isExpandedByDefault = false) {
+            const headerBtn = document.createElement('button');
+            headerBtn.className = 'zoom-category-header';
+            if (categoryName === "⭐ Favorites") {
+                headerBtn.classList.add('fav-header');
+            }
+            headerBtn.innerHTML = `<i class="fa-solid fa-chevron-right arrow"></i> <i class="fa-regular fa-folder"></i> ${categoryName} (${channels.length})`;
+            
+            const subListUl = document.createElement('ul');
+            subListUl.className = 'zoom-channel-sublist';
+
+            if (isExpandedByDefault) {
+                headerBtn.classList.add('expanded');
+                subListUl.classList.add('show');
+            }
+
+            channels.forEach((channel) => {
+                const li = document.createElement('li');
+                li.className = 'channel-item';
+                
+                // বর্তমানে কোনো চ্যানেল প্লে হচ্ছে কি না চেক করা
+                if (player.src() === channel.url) {
+                    li.classList.add('active');
+                }
+                
+                const firstLetter = channel.name.charAt(0).toUpperCase();
+                const isStarred = favoriteChannelUrls.includes(channel.url);
+
+                li.innerHTML = `
+                    <div class="channel-icon">${firstLetter}</div>
+                    <div style="flex: 1; padding-right: 30px;">${channel.name}</div>
+                    <button class="fav-star-btn ${isStarred ? 'starred' : ''}" title="${isStarred ? 'Remove from Fav' : 'Add to Fav'}">
+                        <i class="${isStarred ? 'fa-solid' : 'fa-regular'} fa-star"></i>
+                    </button>
+                `;
+
+                // চ্যানেলে ক্লিক ইভেন্ট
+                li.addEventListener('click', (e) => {
+                    // যদি স্টারে ক্লিক না করা হয়ে থাকে, তবেই চ্যানেল প্লে হবে
+                    if (e.target.closest('.fav-star-btn')) return;
+
+                    document.querySelectorAll('.channel-item').forEach(el => el.classList.remove('active'));
+                    li.classList.add('active');
+
+                    player.src({ src: channel.url, type: 'application/x-mpegURL' });
+                    player.play();
+                });
+
+                // স্টার/ফেভারিট বাটনের ক্লিক ইভেন্ট
+                const starBtn = li.querySelector('.fav-star-btn');
+                starBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    
+                    if (favoriteChannelUrls.includes(channel.url)) {
+                        // অলরেডি থাকলে রিমুভ করব
+                        favoriteChannelUrls = favoriteChannelUrls.filter(url => url !== channel.url);
+                    } else {
+                        // না থাকলে অ্যাড করব
+                        favoriteChannelUrls.push(channel.url);
+                    }
+                    
+                    // ব্রাউজার মেমরিতে (LocalStorage) সেভ রাখা যাতে পেজ রিফ্রেশ করলেও ফেভারিট না হারায়
+                    localStorage.setItem('fav_channels', JSON.stringify(favoriteChannelUrls));
+                    
+                    // সাইডবার রি-রেন্ডার করা
+                    renderSidebar(searchInput.value.trim());
+                });
+
+                subListUl.appendChild(li);
+
+                // প্রথমবার পেজ লোড হলে একদম প্রথম ক্যাটাগরির প্রথম চ্যানেল লোড করা (যদি প্লেয়ার সম্পূর্ণ খালি থাকে)
+                if (player.src() === "" && !isExpandedByDefault) {
+                    li.classList.add('active');
+                    player.src({ src: channel.url, type: 'application/x-mpegURL' });
+                    headerBtn.classList.add('expanded');
+                    subListUl.classList.add('show');
+                }
+            });
+
+            headerBtn.addEventListener('click', () => {
+                const isExpanded = headerBtn.classList.contains('expanded');
+                if (isExpanded) {
+                    headerBtn.classList.remove('expanded');
+                    subListUl.classList.remove('show');
+                } else {
+                    headerBtn.classList.add('expanded');
+                    subListUl.classList.add('show');
+                }
+            });
+
+            zoomSidebarContainer.appendChild(headerBtn);
+            zoomSidebarContainer.appendChild(subListUl);
         }
 
         window.onload = fetchAndParseM3U;
