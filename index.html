@@ -6,8 +6,6 @@
     <title>Free IPTV by RAJU</title>
     <!-- Video.js CSS -->
     <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
-    <!-- Video.js Resolution Switcher CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/videojs-contrib-quality-levels@2.1.0/dist/videojs-contrib-quality-levels.css" rel="stylesheet">
     <!-- Google Fonts for Smart Typography -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
     <!-- FontAwesome for Zoom Style Arrows & Stars -->
@@ -309,7 +307,7 @@
         </div>
     </div>
 
-    <!-- Video.js and Essential Quality Plugins (Correct Order Restored) -->
+    <!-- Video.js and Essential Plugins -->
     <script src="https://vjs.zencdn.net/7.20.3/video.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-quality-levels@2.1.0/dist/videojs-contrib-quality-levels.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/videojs-hls-quality-selector@3.5.0/dist/videojs-hls-quality-selector.min.js"></script>
@@ -323,16 +321,18 @@
         const zoomSidebarContainer = document.getElementById('zoom-sidebar-container');
         const searchInput = document.getElementById('search-input');
 
-        // ডোমে সবকিছু সঠিকভাবে রেডি হওয়ার পর স্ক্রিপ্টগুলো একজিকিউট হবে
+        // ডোমে লোড হওয়ার পর সেফ এক্সিকিউশন
         document.addEventListener("DOMContentLoaded", function() {
-            // ১. প্রথমে প্লেয়ার অবজেক্ট তৈরি করা হলো
+            // ১. প্লেয়ার অবজেক্ট তৈরি
             player = videojs('my-video');
             
-            // ২. রেজুলুশন সিলেক্টর সাকসেসফুলি ইনজেক্ট করা হলো
+            // ২. রেজুলুশন সিলেক্টরকে ট্রাই-ক্যাচ (Try-Catch) ব্লকে নেওয়া হলো যেন কোনো এরর দিলেও চ্যানেল লিস্ট লোড বন্ধ না হয়
             try {
-                player.hlsQualitySelector({ displayCurrentQuality: true });
+                if (typeof player.hlsQualitySelector === 'function') {
+                    player.hlsQualitySelector({ displayCurrentQuality: true });
+                }
             } catch(e) {
-                console.log("Quality selector failed to initialize, but continuing...", e);
+                console.log("Quality selector extension bypass: ", e);
             }
 
             // ৩. ফুলস্ক্রিন ও অটো-রোটেট ইভেন্ট হ্যান্ডলার সেটআপ
@@ -340,7 +340,7 @@
                 if (player.isFullscreen()) {
                     if (screen.orientation && screen.orientation.lock) {
                         screen.orientation.lock('landscape').catch(function(error) {
-                            console.log("Orientation lock failed: ", error);
+                            console.log("Orientation lock bypassed: ", error);
                         });
                     }
                 } else {
@@ -350,7 +350,7 @@
                 }
             });
 
-            // ৪. এবার নিরাপদভাবে প্লেলিস্ট লোড করার ফাংশন কল করা হলো
+            // ৪. এবার নিরাপদভাবে প্লেলিস্ট নিয়ে আসা হচ্ছে
             fetchAndParseM3U();
         });
 
@@ -362,7 +362,7 @@
                 
                 const lines = text.split('\n');
                 let currentChannel = null;
-                allChannels = []; // ক্লিয়ার করে নেওয়া হলো
+                allChannels = []; 
 
                 for (let i = 0; i < lines.length; i++) {
                     const line = lines[i].trim();
@@ -389,7 +389,7 @@
                     }
                 }
 
-                // চ্যানেল রেন্ডার করা হচ্ছে
+                // চ্যানেল সাইডবার রেন্ডার করা হচ্ছে
                 renderSidebar();
 
                 searchInput.addEventListener('input', () => {
@@ -467,7 +467,7 @@
                 const li = document.createElement('li');
                 li.className = 'channel-item';
                 
-                if (player && player.src() === channel.url) {
+                if (player && typeof player.src === 'function' && player.src() === channel.url) {
                     li.classList.add('active');
                 }
                 
