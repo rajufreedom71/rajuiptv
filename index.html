@@ -161,11 +161,11 @@
             color: #ffcc00 !important;
         }
 
-        /* Channel Sub-list (গার্লিস চড়া নীল কালার পরিবর্তন করে সফট লাইট ডার্ক থিম দেওয়া হয়েছে) */
+        /* Channel Sub-list */
         .zoom-channel-sublist {
             list-style: none;
             display: none;
-            background-color: #141822; /* হালকা সফট ব্যাকগ্রাউন্ড */
+            background-color: #141822;
             border-left: 3px solid #242c3d;
             margin-left: 10px;
         }
@@ -190,12 +190,12 @@
             color: #00ffcc;
         }
         
-        /* চলমান বা অ্যাক্টিভ চ্যানেলের প্রিমিয়াম লুক */
+        /* Active Channel Look */
         .channel-item.active {
             background: linear-gradient(90deg, #1d2b3a, #151e29);
             color: #00ffcc;
             font-weight: bold;
-            border-left: 3px solid #00ffcc; /* সুন্দর নিয়ন সায়ান বর্ডার */
+            border-left: 3px solid #00ffcc;
             box-shadow: inset 5px 0 10px rgba(0, 255, 204, 0.05);
         }
         
@@ -273,7 +273,7 @@
 </head>
 <body>
 
-    <header>📺 রাজু'র ফ্রি আইপি টিভি</header>
+    <header>📺 রাজু'র ফ্রি আইপি传递 টিভি</header>
 
     <div class="main-container">
         <!-- Sidebar Section -->
@@ -315,7 +315,6 @@
 
         let allChannels = [];
         let favoriteChannelUrls = JSON.parse(localStorage.getItem('fav_channels')) || [];
-        let firstChannelUrl = "";
 
         async function fetchAndParseM3U() {
             try {
@@ -359,29 +358,11 @@
                     renderSidebar(searchInput.value.trim());
                 });
                 
-                if(allChannels.length > 0) {
-                    firstChannelUrl = allChannels[0].url;
-                    setTimeout(() => {
-                        player.src({ src: firstChannelUrl, type: 'application/x-mpegURL' });
-                    }, 1000);
-                }
-                
             } catch (error) {
                 console.error('Error loading M3U file:', error);
                 zoomSidebarContainer.innerHTML = '<div style="padding: 20px; color: red; text-align: center;">প্লেলিস্ট লোড করা যায়নি!</div>';
             }
         }
-
-        function enableUnmutedAutoplay() {
-            if (player.src() !== "") {
-                player.muted(false);
-                player.play().catch(err => console.log("User gesture triggered play"));
-                document.removeEventListener('click', enableUnmutedAutoplay);
-                document.removeEventListener('touchstart', enableUnmutedAutoplay);
-            }
-        }
-        document.addEventListener('click', enableUnmutedAutoplay);
-        document.addEventListener('touchstart', enableUnmutedAutoplay);
 
         function renderSidebar(filterKeyword = "") {
             zoomSidebarContainer.innerHTML = '';
@@ -401,13 +382,12 @@
                 groupedChannels[channel.category].push(channel);
             });
 
-            // সার্চ করলে ক্যাটাগরি ফোল্ডার অটো ওপেন হবে, নরমালি বন্ধ থাকবে
             const shouldExpandAll = keyword !== "";
 
             if (favChannels.length > 0) {
                 const filteredFavs = favChannels.filter(c => c.name.toLowerCase().includes(keyword));
                 if (filteredFavs.length > 0 || !keyword) {
-                    createCategorySection("⭐ Favorites", filteredFavs, true); // Favorites ফোল্ডারটি শুধু ওপেন থাকবে সুবিধার জন্য
+                    createCategorySection("⭐ Favorites", filteredFavs, false); // Favorites-ও শুরুতে বন্ধ থাকবে
                 }
             }
 
@@ -464,7 +444,7 @@
                     li.classList.add('active');
 
                     player.src({ src: channel.url, type: 'application/x-mpegURL' });
-                    player.muted(false); 
+                    player.muted(false); // ক্লিক করলেই সরাসরি ফুল সাউন্ডসহ প্লে হবে
                     player.play().catch(error => {
                         console.log("Play error:", error);
                     });
