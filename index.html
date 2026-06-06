@@ -4,498 +4,67 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Free IPTV by RAJU</title>
-    <!-- Video.js CSS -->
     <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
-    <!-- Google Fonts for Smart Typography -->
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght=700;800&display=swap" rel="stylesheet">
-    <!-- FontAwesome for Zoom Style Arrows & Stars -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-        body {
-            background-color: #11141a;
-            color: #ffffff;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
-        }
-        
-        /* Premium Smart Golden Header Section */
-        header {
-            background: linear-gradient(135deg, #161b26, #090b10);
-            padding: 16px 20px;
-            text-align: center;
-            font-size: 26px;
-            font-weight: 800;
-            letter-spacing: 2px;
-            font-family: 'Montserrat', sans-serif;
-            background: linear-gradient(to right, #ffe066, #f5b041);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 2px 4px 10px rgba(245, 176, 65, 0.2);
-            border-bottom: 2px solid #1f2937;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
-            flex-shrink: 0;
-        }
-        .main-container {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-            flex-direction: row;
-        }
-        
-        /* Sidebar Section */
-        .playlist-section {
-            display: flex;
-            flex-direction: column;
-            background-color: #1a1f29;
-            border-right: 2px solid #242c3d;
-            flex: 1;
-            max-width: 400px;
-            min-width: 320px;
-            order: 1;
-            overflow: hidden;
-        }
-        
-        /* Video Player Section */
-        .player-section {
-            flex: 3;
-            background-color: #000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            order: 2;
-        }
-        
-        .video-js {
-            width: 100% !important;
-            height: 100% !important;
-        }
-        
-        /* Search Box Container */
-        .search-box-container {
-            padding: 15px;
-            background-color: #1e2530;
-            border-bottom: 1px solid #2e384e;
-            position: relative;
-        }
-        .search-input {
-            width: 100%;
-            padding: 10px 12px 10px 38px;
-            background-color: #242c3d;
-            border: 1px solid #2e384e;
-            border-radius: 6px;
-            color: #ffffff;
-            font-size: 14px;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-        .search-input:focus {
-            border-color: #f5b041;
-        }
-        .search-icon {
-            position: absolute;
-            left: 27px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #8899a6;
-            font-size: 14px;
-            pointer-events: none;
-        }
-
-        /* Sidebar Scrollable Area */
-        .zoom-sidebar {
-            flex: 1;
-            overflow-y: auto;
-            padding: 5px 0;
-            -webkit-overflow-scrolling: touch;
-            touch-action: pan-y;
-        }
-
-        /* Category Header */
-        .zoom-category-header {
-            width: 100%;
-            background: transparent;
-            color: #b3c2d4;
-            border: none;
-            padding: 13px 20px;
-            font-size: 14px;
-            font-weight: 600;
-            text-align: left;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            border-bottom: 1px solid #1f2633;
-            transition: background 0.2s, color 0.2s;
-        }
-        .zoom-category-header:hover {
-            background-color: #242c3d;
-            color: #ffffff;
-        }
-        .zoom-category-header i.arrow {
-            font-size: 12px;
-            transition: transform 0.2s ease;
-            width: 12px;
-        }
-        .zoom-category-header.expanded {
-            color: #f5b041;
-            background-color: #1f2633;
-            border-bottom: none;
-        }
-        .zoom-category-header.expanded i.arrow {
-            transform: rotate(90deg);
-        }
-
-        .all-header { color: #00ffcc !important; }
-        .fav-header { color: #ffcc00 !important; }
-
-        /* Channel Sub-list Container */
-        .zoom-channel-sublist {
-            list-style: none;
-            display: none;
-            background-color: #141822;
-            border-left: 3px solid #242c3d;
-            margin-left: 10px;
-        }
-        .zoom-channel-sublist.show {
-            display: block;
-        }
-
-        /* Individual Channel Row */
-        .channel-item {
-            padding: 12px 20px;
-            border-bottom: 1px solid #1a202c;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            font-size: 13px;
-            color: #cbd5e1;
-            position: relative;
-        }
-        .channel-item:hover {
-            background-color: #1f2633;
-            color: #f5b041;
-        }
-        
-        .channel-item.active {
-            background: linear-gradient(90deg, #1d2b3a, #151e29);
-            color: #f5b041;
-            font-weight: bold;
-            border-left: 3px solid #f5b041;
-            box-shadow: inset 5px 0 10px rgba(245, 176, 65, 0.05);
-        }
-        
-        .channel-icon {
-            width: 24px;
-            height: 24px;
-            border-radius: 6px;
-            background-color: #2e384e;
-            margin-right: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            font-weight: bold;
-            color: #fff;
-        }
-        .channel-item.active .channel-icon {
-            background-color: #f5b041;
-            color: #11141a;
-        }
-
-        /* Favorite Star Button */
-        .fav-star-btn {
-            position: absolute;
-            right: 20px;
-            background: transparent;
-            border: none;
-            color: #4a5768;
-            cursor: pointer;
-            font-size: 16px;
-            padding: 5px;
-        }
-        .fav-star-btn.starred {
-            color: #ffcc00 !important;
-        }
-
-        /* Manual Resolution Gear Button Custom Layout */
-        .vjs-quality-selector-custom {
-            cursor: pointer;
-            font-size: 1.2em;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 10px;
-        }
-
-        /* Mobile Responsive Configurations */
-        @media (max-width: 768px) {
-            body { overflow: auto; }
-            .main-container { flex-direction: column; height: auto; overflow: visible; }
-            .player-section {
-                order: 1; flex: none; width: 100%; aspect-ratio: 16 / 9;
-                position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            }
-            .playlist-section { order: 2; max-width: 100%; min-width: 100%; flex: none; border-right: none; border-top: 2px solid #242c3d; overflow: visible; }
-            .zoom-sidebar { overflow-y: visible; }
-            header { font-size: 22px; padding: 14px; }
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #11141a; color: #ffffff; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        header { background: linear-gradient(to right, #ffe066, #f5b041); -webkit-background-clip: text; -webkit-text-fill-color: transparent; padding: 16px; text-align: center; font-size: 26px; font-weight: 800; border-bottom: 2px solid #1f2937; }
+        .main-container { display: flex; flex: 1; overflow: hidden; }
+        .playlist-section { flex: 1; max-width: 400px; background-color: #1a1f29; display: flex; flex-direction: column; border-right: 2px solid #242c3d; }
+        .player-section { flex: 3; background-color: #000; display: flex; align-items: center; justify-content: center; }
+        .video-js { width: 100% !important; height: 100% !important; }
+        .search-box-container { padding: 15px; background: #1e2530; }
+        .search-input { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #2e384e; background: #242c3d; color: white; }
+        .zoom-sidebar { flex: 1; overflow-y: auto; }
+        .channel-item { padding: 12px 20px; border-bottom: 1px solid #1a202c; cursor: pointer; display: flex; align-items: center; color: #cbd5e1; }
+        .channel-item:hover { background: #1f2633; color: #f5b041; }
+        @media (max-width: 768px) { .main-container { flex-direction: column; } .player-section { height: 250px; } }
     </style>
 </head>
 <body>
-
     <header>📺 FREE IPTV BY RAJU</header>
-
     <div class="main-container">
-        <!-- Sidebar Section -->
         <div class="playlist-section">
-            <div class="search-box-container">
-                <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                <input type="text" id="search-input" class="search-input" placeholder="Search channels..." />
-            </div>
-            
-            <div class="zoom-sidebar" id="zoom-sidebar-container">
-                <div style="padding: 20px; color: #8899a6; text-align: center;" id="loading-text">Loading channels...</div>
-            </div>
+            <div class="search-box-container"><input type="text" id="search-input" class="search-input" placeholder="Search channels..."></div>
+            <div class="zoom-sidebar" id="zoom-sidebar-container">Loading...</div>
         </div>
-
-        <!-- Video Player Section -->
         <div class="player-section">
-            <video id="my-video" class="video-js vjs-default-skin vjs-big-play-centered" controls autoplay playsinline preload="auto">
-                <p class="vjs-no-js">To view this video please enable JavaScript</p>
-            </video>
+            <video id="my-video" class="video-js vjs-default-skin vjs-big-play-centered" controls autoplay playsinline></video>
         </div>
     </div>
 
-    <!-- Video.js Base Library (শুধু একটি ফাইল, কোনো থার্ডপার্টি প্লাগইন ঝামেলা নেই) -->
     <script src="https://vjs.zencdn.net/7.20.3/video.js"></script>
-
     <script>
-        const m3uUrl = 'https://raw.githubusercontent.com/rajufreedom71/rajuiptv/main/playlist.m3u';
-        let player;
-        let allChannels = [];
-        let favoriteChannelUrls = JSON.parse(localStorage.getItem('fav_channels')) || [];
-        
-        const zoomSidebarContainer = document.getElementById('zoom-sidebar-container');
-        const searchInput = document.getElementById('search-input');
+        // প্রক্সি লিঙ্ক দিয়ে সরাসরি গিটহাব ফাইল ফেচ করা
+        const m3uUrl = 'https://corsproxy.io/?https://raw.githubusercontent.com/rajufreedom71/rajuiptv/main/playlist.m3u';
+        let player = videojs('my-video');
 
-        document.addEventListener("DOMContentLoaded", function() {
-            // ১. স্টেবল বেস প্লেয়ার তৈরি
-            player = videojs('my-video');
-            
-            // ২. ডাইনামিক ইন্টারনাল কোয়ালিটি বাটন ক্রিয়েশন (কখনো ক্র্যাশ করবে না)
-            player.ready(function() {
-                try {
-                    let controlBar = player.controlBar;
-                    let customButton = controlBar.addChild('button', {}, controlBar.children_.length - 1);
-                    let buttonDom = customButton.el();
-                    buttonDom.className = 'vjs-control vjs-button vjs-quality-selector-custom';
-                    buttonDom.innerHTML = '<i class="fa-solid fa-gear" title="Quality Settings"></i>';
-                    
-                    buttonDom.addEventListener('click', function() {
-                        // কোয়ালিটি লেভেল রিড করার সেফ ট্রাই
-                        let qualityLevels = player.qualityLevels ? player.qualityLevels() : null;
-                        if (qualityLevels && qualityLevels.length > 0) {
-                            let qualities = [];
-                            for(let i=0; i<qualityLevels.length; i++) {
-                                qualities.push(qualityLevels[i].height + "p");
-                            }
-                            alert("Available Quality Resolutions:\n" + qualities.join("\n") + "\n\n(Currently streaming at optimal quality auto-managed by your network)");
-                        } else {
-                            alert("Quality Settings:\nThis stream is optimized at single direct high-definition resolution.");
-                        }
-                    });
-                } catch(e) {
-                    console.log("Custom quality element bypassed.", e);
-                }
-            });
-
-            // ৩. ফুলস্ক্রিন ও অটো-রোটেট
-            player.on('fullscreenchange', function() {
-                if (player.isFullscreen()) {
-                    if (screen.orientation && screen.orientation.lock) {
-                        screen.orientation.lock('landscape').catch(function(e){});
-                    }
-                } else {
-                    if (screen.orientation && screen.orientation.unlock) {
-                        screen.orientation.unlock();
-                    }
-                }
-            });
-
-            // ৪. প্লেলিস্ট ডাটা ফেচিং
-            fetchAndParseM3U();
-        });
-
-        async function fetchAndParseM3U() {
+        async function init() {
             try {
                 const response = await fetch(m3uUrl);
-                if (!response.ok) throw new Error('Network response was not ok');
                 const text = await response.text();
-                
                 const lines = text.split('\n');
-                let currentChannel = null;
-                allChannels = []; 
+                let container = document.getElementById('zoom-sidebar-container');
+                container.innerHTML = '';
 
                 for (let i = 0; i < lines.length; i++) {
-                    const line = lines[i].trim();
-                    
-                    if (line.startsWith('#EXTINF:')) {
-                        let category = "General";
-                        const groupMatch = line.match(/group-title="([^"]+)"/);
-                        if (groupMatch && groupMatch[1]) {
-                            category = groupMatch[1];
-                        }
-
-                        const nameIndex = line.lastIndexOf(',');
-                        let name = "Unknown Channel";
-                        if (nameIndex !== -1) {
-                            name = line.substring(nameIndex + 1).trim();
-                        }
-                        currentChannel = { name: name, category: category };
-                    } else if (line.startsWith('http://') || line.startsWith('https://')) {
-                        if (currentChannel) {
-                            currentChannel.url = line;
-                            allChannels.push(currentChannel);
-                            currentChannel = null;
-                        }
+                    if (lines[i].startsWith('#EXTINF:')) {
+                        let name = lines[i].split(',')[1];
+                        let url = lines[i+1];
+                        let div = document.createElement('div');
+                        div.className = 'channel-item';
+                        div.innerHTML = name;
+                        div.onclick = () => { player.src({src: url, type: 'application/x-mpegURL'}); player.play(); };
+                        container.appendChild(div);
                     }
                 }
-
-                renderSidebar();
-
-                searchInput.addEventListener('input', () => {
-                    renderSidebar(searchInput.value.trim());
-                });
-                
-            } catch (error) {
-                console.error('Error loading M3U file:', error);
-                zoomSidebarContainer.innerHTML = '<div style="padding: 20px; color: red; text-align: center;">Playlist failed to load!</div>';
+            } catch (e) {
+                document.getElementById('zoom-sidebar-container').innerHTML = 'Error loading list. Check console.';
             }
         }
-
-        function renderSidebar(filterKeyword = "") {
-            zoomSidebarContainer.innerHTML = '';
-            const keyword = filterKeyword.toLowerCase();
-
-            const favChannels = allChannels.filter(c => favoriteChannelUrls.includes(c.url));
-            const groupedChannels = {};
-            
-            allChannels.forEach(channel => {
-                if (keyword && !channel.name.toLowerCase().includes(keyword)) return;
-                
-                if (!groupedChannels[channel.category]) {
-                    groupedChannels[channel.category] = [];
-                }
-                groupedChannels[channel.category].push(channel);
-            });
-
-            const shouldExpandAll = keyword !== "";
-
-            if (allChannels.length > 0 && !keyword) {
-                createCategorySection("🌐 All Channels", allChannels, false, "all-header");
-            }
-
-            if (favChannels.length > 0) {
-                const filteredFavs = favChannels.filter(c => c.name.toLowerCase().includes(keyword));
-                if (filteredFavs.length > 0 || !keyword) {
-                    createCategorySection("⭐ Favorites", filteredFavs, false, "fav-header");
-                }
-            }
-
-            Object.keys(groupedChannels).forEach(categoryName => {
-                if (groupedChannels[categoryName].length > 0) {
-                    createCategorySection(categoryName, groupedChannels[categoryName], shouldExpandAll);
-                }
-            });
-
-            if (zoomSidebarContainer.children.length === 0) {
-                zoomSidebarContainer.innerHTML = '<div style="padding: 20px; color: #888; text-align: center;">No channels found!</div>';
-            }
-        }
-
-        function createCategorySection(categoryName, channels, isExpandedByDefault = false, specialClass = "") {
-            const headerBtn = document.createElement('button');
-            headerBtn.className = 'zoom-category-header';
-            if (specialClass) headerBtn.classList.add(specialClass);
-            headerBtn.innerHTML = `<i class="fa-solid fa-chevron-right arrow"></i> <i class="fa-regular fa-folder"></i> ${categoryName} (${channels.length})`;
-            
-            const subListUl = document.createElement('ul');
-            subListUl.className = 'zoom-channel-sublist';
-
-            if (isExpandedByDefault) {
-                headerBtn.classList.add('expanded');
-                subListUl.classList.add('show');
-            }
-
-            channels.forEach((channel) => {
-                const li = document.createElement('li');
-                li.className = 'channel-item';
-                
-                if (player && typeof player.src === 'function' && player.src() === channel.url) {
-                    li.classList.add('active');
-                }
-                
-                const firstLetter = channel.name.charAt(0).toUpperCase();
-                const isStarred = favoriteChannelUrls.includes(channel.url);
-
-                li.innerHTML = `
-                    <div class="channel-icon">${firstLetter}</div>
-                    <div style="flex: 1; padding-right: 30px;">${channel.name}</div>
-                    <button class="fav-star-btn ${isStarred ? 'starred' : ''}">
-                        <i class="${isStarred ? 'fa-solid' : 'fa-regular'} fa-star"></i>
-                    </button>
-                `;
-
-                li.addEventListener('click', (e) => {
-                    if (e.target.closest('.fav-star-btn')) return;
-
-                    document.querySelectorAll('.channel-item').forEach(el => el.classList.remove('active'));
-                    li.classList.add('active');
-
-                    player.src({ src: channel.url, type: 'application/x-mpegURL' });
-                    player.play().catch(error => console.log("Play error:", error));
-                });
-
-                const starBtn = li.querySelector('.fav-star-btn');
-                starBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    if (favoriteChannelUrls.includes(channel.url)) {
-                        favoriteChannelUrls = favoriteChannelUrls.filter(url => url !== channel.url);
-                    } else {
-                        favoriteChannelUrls.push(channel.url);
-                    }
-                    localStorage.setItem('fav_channels', JSON.stringify(favoriteChannelUrls));
-                    renderSidebar(searchInput.value.trim());
-                });
-
-                subListUl.appendChild(li);
-            });
-
-            headerBtn.addEventListener('click', () => {
-                const isExpanded = headerBtn.classList.contains('expanded');
-                if (isExpanded) {
-                    headerBtn.classList.remove('expanded');
-                    subListUl.classList.remove('show');
-                } else {
-                    headerBtn.classList.add('expanded');
-                    subListUl.classList.add('show');
-                }
-            });
-
-            zoomSidebarContainer.appendChild(headerBtn);
-            zoomSidebarContainer.appendChild(subListUl);
-        }
+        init();
     </script>
 </body>
 </html>
