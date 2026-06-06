@@ -1,9 +1,112 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Raju IPTV</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raju IPTV | Free Streaming Platform</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
-  <h2>IPTV Site Running 🎉</h2>
+<body class="bg-slate-900 text-white font-sans text-base">
+
+    <header class="bg-slate-800 p-4 sticky top-0 z-50 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-sky-500 tracking-wider"><i class="fa-solid fa-tv mr-2"></i>RAJU IPTV</h1>
+            <nav class="space-x-6 hidden md:block text-sm font-medium">
+                <a href="#features" class="hover:text-sky-400 transition">Features</a>
+                <a href="#guide" class="hover:text-sky-400 transition">How to Use</a>
+                <a href="#download" class="bg-sky-600 hover:bg-sky-700 px-4 py-2 rounded-full transition">Download Apps</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="container mx-auto my-16 px-4 text-center">
+        <span class="bg-sky-500/10 text-sky-400 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider border border-sky-500/20">100% Free Open Source Project</span>
+        <h2 class="text-4xl md:text-6xl font-extrabold mt-4 mb-6">Watch Live TV on Any Device <span class="text-sky-400">Completely Free</span></h2>
+        <p class="text-lg text-slate-400 max-w-2xl mx-auto mb-8">Stream live television channels and entertainment content instantly without any accounts, sign-ups, or subscriptions.</p>
+        <a href="#guide" class="bg-sky-600 hover:bg-sky-700 text-lg font-bold px-8 py-4 rounded-lg shadow-lg transition transform hover:scale-105 inline-block">Get Started</a>
+    </section>
+
+    <section id="features" class="container mx-auto py-12 px-4 max-w-5xl">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-slate-800/50 p-6 rounded-xl border border-slate-700/50">
+                <i class="fa-solid fa-lock-open text-3xl text-sky-400 mb-4"></i>
+                <h4 class="text-xl font-bold mb-2">No Login or Fees</h4>
+                <p class="text-slate-400 text-sm">No registrations, no premium plans, and no hidden charges. Anyone can access the stream instantly.</p>
+            </div>
+            <div class="bg-slate-800/50 p-6 rounded-xl border border-slate-700/50">
+                <i class="fa-solid fa-mobile-screen text-3xl text-sky-400 mb-4"></i>
+                <h4 class="text-xl font-bold mb-2">Multi-Device Support</h4>
+                <p class="text-slate-400 text-sm">Works flawlessly on Android phones, Smart TVs, Firestick, PC, iOS, and Web browsers.</p>
+            </div>
+            <div class="bg-slate-800/50 p-6 rounded-xl border border-slate-700/50">
+                <i class="fa-solid fa-code text-3xl text-sky-400 mb-4"></i>
+                <h4 class="text-xl font-bold mb-2">Open M3U Playlist</h4>
+                <p class="text-slate-400 text-sm">Easily import our free public M3U link into your favorite custom media player apps.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="guide" class="bg-slate-800 py-16 px-4">
+        <div class="container mx-auto max-w-3xl">
+            <h3 class="text-3xl font-bold text-center mb-12">Setup Guide</h3>
+            
+            <div class="space-y-8">
+                <div class="flex gap-4">
+                    <div class="bg-sky-600 w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg shrink-0">1</div>
+                    <div>
+                        <h4 class="text-xl font-bold mb-2">Download an IPTV Player</h4>
+                        <p class="text-slate-400 text-sm">Install any IPTV player on your device. We recommend <span class="text-white font-medium">IPTV Smarters Pro</span> for mobile/TV or <span class="text-white font-medium">VLC Media Player</span> for PC.</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-4">
+                    <div class="bg-sky-600 w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg shrink-0">2</div>
+                    <div>
+                        <h4 class="text-xl font-bold mb-2">Copy the Free M3U Playlist URL</h4>
+                        <p class="text-slate-400 text-sm mb-3">Copy the open-source streaming link provided below:</p>
+                        <div class="bg-slate-900 border border-slate-700 p-3 rounded-lg flex items-center justify-between font-mono text-xs text-sky-400 break-all">
+                            <span>https://raw.githubusercontent.com/rajufreedom71/rajuiptv/main/playlist.m3u</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-4">
+                    <div class="bg-sky-600 w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg shrink-0">3</div>
+                    <div>
+                        <h4 class="text-xl font-bold mb-2">Load the Link & Enjoy</h4>
+                        <p class="text-slate-400 text-sm">Open your player application, navigate to "Add M3U URL" or "Open Network Stream", paste the copied URL, and enjoy endless channels instantly.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="download" class="container mx-auto my-16 px-4 text-center max-w-2xl">
+        <h3 class="text-2xl font-bold mb-4">Recommended Media Players</h3>
+        <p class="text-slate-400 text-sm mb-8">Get official player applications safely from trusted sources:</p>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <a href="https://play.google.com/store" target="_blank" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 p-4 rounded-xl flex items-center justify-center gap-3 transition">
+                <i class="fa-brands fa-google-play text-2xl text-green-400"></i>
+                <div class="text-left">
+                    <p class="text-xs text-slate-400">For Android</p>
+                    <p class="font-bold text-sm">Google Play Store</p>
+                </div>
+            </a>
+            <a href="https://www.videolan.org/vlc/" target="_blank" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 p-4 rounded-xl flex items-center justify-center gap-3 transition">
+                <i class="fa-orange-vision fa-solid text-2xl text-orange-500"></i>
+                <div class="text-left">
+                    <p class="text-xs text-slate-400">For Windows / PC</p>
+                    <p class="font-bold text-sm">VLC Media Player</p>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <footer class="bg-slate-950 py-6 text-center text-sm text-slate-600 border-t border-slate-800">
+        <p>Built for open entertainment. Free & Open Source.</p>
+    </footer>
+
 </body>
 </html>
