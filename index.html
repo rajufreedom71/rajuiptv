@@ -4,12 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Free IPTV by RAJU</title>
-    <!-- Video.js CSS -->
-    <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
-    <!-- New Premium Quality Menu CSS (ইউটিউব স্টাইল গিয়ার আইকন) -->
-    <link href="https://cdn.jsdelivr.net/npm/videojs-quality-menu@1.1.2/dist/videojs-quality-menu.css" rel="stylesheet">
     <!-- Google Fonts for Smart Typography -->
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght=700;800&display=swap" rel="stylesheet">
     <!-- FontAwesome for Zoom Style Arrows & Stars -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
@@ -77,15 +73,14 @@
             order: 2;
         }
         
-        .video-js {
+        /* Clappr Player Container Responsiveness */
+        #player-wrapper {
             width: 100% !important;
             height: 100% !important;
         }
-
-        /* Quality Menu Icon Styling Customization */
-        .vjs-quality-menu .vjs-quality-menu-button:before {
-            font-family: VideoJS;
-            content: "\f110"; /* Premium gear icon */
+        #player-wrapper [data-player] {
+            width: 100% !important;
+            height: 100% !important;
         }
         
         /* Search Box Container */
@@ -266,52 +261,53 @@
             </div>
         </div>
 
-        <!-- Video Player Section -->
+        <!-- Video Player Section (Clappr Engine) -->
         <div class="player-section">
-            <video id="my-video" class="video-js vjs-default-skin vjs-big-play-centered" controls autoplay playsinline preload="auto">
-                <p class="vjs-no-js">To view this video please enable JavaScript</p>
-            </video>
+            <div id="player-wrapper"></div>
         </div>
     </div>
 
-    <!-- Video.js and Core Quality Menu Extension Libraries -->
-    <script src="https://vjs.zencdn.net/7.20.3/video.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/videojs-quality-menu@1.1.2/dist/videojs-quality-menu.min.js"></script>
+    <!-- Clappr Core Engine with Level Selector Plugin for Resolution Feature -->
+    <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/clappr-level-selector-plugin@latest/dist/level-selector.min.js"></script>
 
     <script>
         const m3uUrl = 'https://raw.githubusercontent.com/rajufreedom71/rajuiptv/main/playlist.m3u';
-        let player;
+        let playerInstance;
         let allChannels = [];
         let favoriteChannelUrls = JSON.parse(localStorage.getItem('fav_channels')) || [];
+        let currentActiveUrl = "";
         
         const zoomSidebarContainer = document.getElementById('zoom-sidebar-container');
         const searchInput = document.getElementById('search-input');
 
         document.addEventListener("DOMContentLoaded", function() {
-            // ১. নতুন কোয়ালিটি মেনু প্লাগইন সহ প্লেয়ার ইনিশিয়ালাইজেশন
-            player = videojs('my-video', {
-                plugins: {
-                    qualityMenu: {
-                        default: 'auto',
-                        useStyle: true
+            // ১. ক্ল্যাপর প্লেয়ার ইনিশিয়ালাইজেশন (রেজুল্যুশন প্লাগইন সহ)
+            playerInstance = new Clappr.Player({
+                source: "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8", // ডিফল্ট স্টার্টআপ লিঙ্ক
+                parentId: "#player-wrapper",
+                plugins: [LevelSelector],
+                levelSelectorConfig: {
+                    title: 'Quality',
+                    labels: {
+                        2: 'High', 
+                        1: 'Medium',
+                        0: 'Low'
                     }
-                }
-            });
-            
-            // ২. ফুলস্ক্রিন অটো-রোটেট
-            player.on('fullscreenchange', function() {
-                if (player.isFullscreen()) {
-                    if (screen.orientation && screen.orientation.lock) {
-                        screen.orientation.lock('landscape').catch(function(e){});
-                    }
-                } else {
-                    if (screen.orientation && screen.orientation.unlock) {
-                        screen.orientation.unlock();
+                },
+                preload: 'auto',
+                autoPlay: true,
+                width: '100%',
+                height: '100%',
+                playback: {
+                    playInline: true,
+                    hlsjsConfig: {
+                        enableWorker: true
                     }
                 }
             });
 
-            // ৩. প্লেলিস্ট ফেচ করা
+            // ২. প্লেলিস্ট ডাটা ফেচ করা
             fetchAndParseM3U();
         });
 
@@ -420,7 +416,7 @@
                 const li = document.createElement('li');
                 li.className = 'channel-item';
                 
-                if (player && typeof player.src === 'function' && player.src() === channel.url) {
+                if (currentActiveUrl === channel.url) {
                     li.classList.add('active');
                 }
                 
@@ -440,9 +436,11 @@
 
                     document.querySelectorAll('.channel-item').forEach(el => el.classList.remove('active'));
                     li.classList.add('active');
+                    currentActiveUrl = channel.url;
 
-                    player.src({ src: channel.url, type: 'application/x-mpegURL' });
-                    player.play().catch(error => console.log("Play error:", error));
+                    // ক্ল্যাপর ডাইনামিক সোর্স চেইঞ্জ লোড
+                    playerInstance.load(channel.url);
+                    playerInstance.play();
                 });
 
                 const starBtn = li.querySelector('.fav-star-btn');
