@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>রাজু'র ফ্রি আইপি টিভি</title>
+    <title>Free IPTV by RAJU</title>
     <!-- Video.js CSS -->
     <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
     <!-- FontAwesome for Zoom Style Arrows & Stars -->
@@ -24,16 +24,19 @@
             height: 100vh;
             overflow: hidden;
         }
+        
+        /* Premium Glowing Header Section */
         header {
-            background: linear-gradient(135deg, #1e2530, #0f1319);
-            padding: 12px 20px;
+            background: linear-gradient(135deg, #151a24, #0b0d13);
+            padding: 14px 20px;
             text-align: center;
-            font-size: 20px;
-            font-weight: bold;
-            letter-spacing: 1px;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
             color: #00ffcc;
+            text-shadow: 0 0 10px rgba(0, 255, 204, 0.4);
             border-bottom: 2px solid #1f2937;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
             flex-shrink: 0;
         }
         .main-container {
@@ -156,12 +159,15 @@
             transform: rotate(90deg);
         }
 
-        /* Favorites Folder */
+        /* Special Colors for Master Folders */
+        .all-header {
+            color: #00ffcc !important;
+        }
         .fav-header {
             color: #ffcc00 !important;
         }
 
-        /* Channel Sub-list */
+        /* Channel Sub-list Container */
         .zoom-channel-sublist {
             list-style: none;
             display: none;
@@ -190,7 +196,7 @@
             color: #00ffcc;
         }
         
-        /* Active Channel Look */
+        /* Active Running Channel Accent */
         .channel-item.active {
             background: linear-gradient(90deg, #1d2b3a, #151e29);
             color: #00ffcc;
@@ -232,7 +238,7 @@
             color: #ffcc00 !important;
         }
 
-        /* Mobile Layout */
+        /* Mobile Responsive Configurations */
         @media (max-width: 768px) {
             body {
                 overflow: auto;
@@ -265,25 +271,27 @@
                 overflow-y: visible;
             }
             header {
-                font-size: 18px;
-                padding: 10px;
+                font-size: 19px;
+                padding: 12px;
             }
         }
     </style>
 </head>
 <body>
 
-    <header>📺 রাজু'র ফ্রি আইপি传递 টিভি</header>
+    <!-- সম্পূর্ণ ইংলিশে প্রফেশনাল হেডার -->
+    <header>📺 Free IPTV by RAJU</header>
 
     <div class="main-container">
         <!-- Sidebar Section -->
         <div class="playlist-section">
-            <div class="playlist-header">চ্যানেল ক্যাটাগরি (<span id="count">0</span>)</div>
+            <!-- চ্যানেল ক্যাটাগরি লেখা পরিবর্তন করে ইংলিশ করা হয়েছে -->
+            <div class="playlist-header">Channel Category (<span id="count">0</span>)</div>
             
             <!-- Zoom Style Search Bar -->
             <div class="search-box-container">
                 <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                <input type="text" id="search-input" class="search-input" placeholder="চ্যানেল খুঁজুন (Search channels...)" />
+                <input type="text" id="search-input" class="search-input" placeholder="Search channels..." />
             </div>
             
             <!-- Sidebar Vertical Container -->
@@ -360,7 +368,7 @@
                 
             } catch (error) {
                 console.error('Error loading M3U file:', error);
-                zoomSidebarContainer.innerHTML = '<div style="padding: 20px; color: red; text-align: center;">প্লেলিস্ট লোড করা যায়নি!</div>';
+                zoomSidebarContainer.innerHTML = '<div style="padding: 20px; color: red; text-align: center;">Playlist failed to load!</div>';
             }
         }
 
@@ -384,13 +392,20 @@
 
             const shouldExpandAll = keyword !== "";
 
+            // ১. সবার উপরে "All Channels" ফোল্ডার তৈরি করা হলো
+            if (allChannels.length > 0 && !keyword) {
+                createCategorySection("🌐 All Channels", allChannels, false, "all-header");
+            }
+
+            // ২. প্রিয় চ্যানেলগুলোর (Favorites) ফোল্ডার
             if (favChannels.length > 0) {
                 const filteredFavs = favChannels.filter(c => c.name.toLowerCase().includes(keyword));
                 if (filteredFavs.length > 0 || !keyword) {
-                    createCategorySection("⭐ Favorites", filteredFavs, false); // Favorites-ও শুরুতে বন্ধ থাকবে
+                    createCategorySection("⭐ Favorites", filteredFavs, false, "fav-header");
                 }
             }
 
+            // ৩. বাকি ক্যাটাগরিগুলো নিচে ক্রমানুসারে সাজানো
             Object.keys(groupedChannels).forEach(categoryName => {
                 if (groupedChannels[categoryName].length > 0) {
                     createCategorySection(categoryName, groupedChannels[categoryName], shouldExpandAll);
@@ -398,15 +413,15 @@
             });
 
             if (zoomSidebarContainer.children.length === 0) {
-                zoomSidebarContainer.innerHTML = '<div style="padding: 20px; color: #888; text-align: center;">কোনো চ্যানেল পাওয়া যায়নি!</div>';
+                zoomSidebarContainer.innerHTML = '<div style="padding: 20px; color: #888; text-align: center;">No channels found!</div>';
             }
         }
 
-        function createCategorySection(categoryName, channels, isExpandedByDefault = false) {
+        function createCategorySection(categoryName, channels, isExpandedByDefault = false, specialClass = "") {
             const headerBtn = document.createElement('button');
             headerBtn.className = 'zoom-category-header';
-            if (categoryName === "⭐ Favorites") {
-                headerBtn.classList.add('fav-header');
+            if (specialClass) {
+                headerBtn.classList.add(specialClass);
             }
             headerBtn.innerHTML = `<i class="fa-solid fa-chevron-right arrow"></i> <i class="fa-regular fa-folder"></i> ${categoryName} (${channels.length})`;
             
@@ -444,7 +459,7 @@
                     li.classList.add('active');
 
                     player.src({ src: channel.url, type: 'application/x-mpegURL' });
-                    player.muted(false); // ক্লিক করলেই সরাসরি ফুল সাউন্ডসহ প্লে হবে
+                    player.muted(false); 
                     player.play().catch(error => {
                         console.log("Play error:", error);
                     });
