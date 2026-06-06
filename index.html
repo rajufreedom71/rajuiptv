@@ -116,7 +116,7 @@
             overflow-y: auto;
             flex: 1;
             padding: 10px 0;
-            -webkit-overflow-scrolling: touch; /* smooth mobile scroll */
+            -webkit-overflow-scrolling: touch;
         }
 
         /* Zoom Category Header */
@@ -169,7 +169,7 @@
 
         /* Individual Channel Row */
         .channel-item {
-            padding: 12px 20px; /* Enhanced for mobile touch */
+            padding: 12px 20px;
             border-bottom: 1px solid #1e2530;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -230,7 +230,7 @@
                 order: 1;
                 flex: none;
                 width: 100%;
-                aspect-ratio: 16 / 9; /* Perfect video dimension */
+                aspect-ratio: 16 / 9;
             }
             .playlist-section {
                 order: 2;
@@ -249,7 +249,8 @@
 </head>
 <body>
 
-    <header>📺 রাজু'র ফ্রি আইপি充 টিভি</header>
+    <!-- চাইনিজ লেখা সম্পূর্ণ রিমুভ করা হয়েছে -->
+    <header>📺 রাজু'র ফ্রি আইপি টিভি</header>
 
     <div class="main-container">
         <!-- Sidebar Section -->
@@ -270,8 +271,8 @@
 
         <!-- Video Player Section -->
         <div class="player-section">
-            <!-- added playsinline, autoplay, muted for extreme mobile compatibility -->
-            <video id="my-video" class="video-js vjs-default-skin vjs-big-play-centered" controls autoplay muted playsinline preload="auto" data-setup="{}">
+            <!-- অটো সাউন্ড এনাবল করার জন্য muted ট্যাগ ফেলে দেওয়া হয়েছে -->
+            <video id="my-video" class="video-js vjs-default-skin vjs-big-play-centered" controls autoplay playsinline preload="auto" data-setup="{}">
                 <p class="vjs-no-js">
                     To view this video please enable JavaScript
                 </p>
@@ -292,6 +293,7 @@
 
         let allChannels = [];
         let favoriteChannelUrls = JSON.parse(localStorage.getItem('fav_channels')) || [];
+        let firstChannelUrl = "";
 
         async function fetchAndParseM3U() {
             try {
@@ -335,11 +337,32 @@
                     renderSidebar(searchInput.value.trim());
                 });
                 
+                // প্রথম চ্যানেলের সোর্স সেটআপ (মোবাইল সাউন্ড ফিক্স ট্রিক)
+                if(allChannels.length > 0) {
+                    firstChannelUrl = allChannels[0].url;
+                    setTimeout(() => {
+                        player.src({ src: firstChannelUrl, type: 'application/x-mpegURL' });
+                    }, 1000);
+                }
+                
             } catch (error) {
                 console.error('Error loading M3U file:', error);
                 zoomSidebarContainer.innerHTML = '<div style="padding: 20px; color: red; text-align: center;">প্লেলিস্ট লোড করা যায়নি!</div>';
             }
         }
+
+        // স্ক্রিনে ইউজারের প্রথম স্পর্শেই সাউন্ডসহ অটো-প্লে চালু করার গ্লোবাল লিসেনার
+        function enableUnmutedAutoplay() {
+            if (player.src() !== "") {
+                player.muted(false);
+                player.play().catch(err => console.log("User gesture triggered play"));
+                // একবার সাউন্ড অন হয়ে গেলে এই লিসেনার রিমুভ করে দেওয়া হবে
+                document.removeEventListener('click', enableUnmutedAutoplay);
+                document.removeEventListener('touchstart', enableUnmutedAutoplay);
+            }
+        }
+        document.addEventListener('click', enableUnmutedAutoplay);
+        document.addEventListener('touchstart', enableUnmutedAutoplay);
 
         function renderSidebar(filterKeyword = "") {
             zoomSidebarContainer.innerHTML = '';
@@ -419,10 +442,11 @@
                     document.querySelectorAll('.channel-item').forEach(el => el.classList.remove('active'));
                     li.classList.add('active');
 
+                    // সাউন্ডসহ নতুন চ্যানেল প্লে
                     player.src({ src: channel.url, type: 'application/x-mpegURL' });
-                    // Explicit play with user-interaction handler
+                    player.muted(false); 
                     player.play().catch(error => {
-                        console.log("Autoplay was prevented, trying muted play", error);
+                        console.log("Play error:", error);
                     });
                 });
 
@@ -444,7 +468,6 @@
 
                 if (player.src() === "" && !isExpandedByDefault) {
                     li.classList.add('active');
-                    player.src({ src: channel.url, type: 'application/x-mpegURL' });
                     headerBtn.classList.add('expanded');
                     subListUl.classList.add('show');
                 }
