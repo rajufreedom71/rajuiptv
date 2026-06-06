@@ -45,14 +45,15 @@
         
         /* Sidebar Section (LEFT) */
         .playlist-section {
-            flex: 1;
-            background-color: #1a1f29;
-            border-right: 2px solid #242c3d;
             display: flex;
             flex-direction: column;
+            background-color: #1a1f29;
+            border-right: 2px solid #242c3d;
+            flex: 1;
             max-width: 400px;
             min-width: 320px;
             order: 1;
+            overflow: hidden;
         }
         
         /* Video Player Section */
@@ -111,12 +112,13 @@
             pointer-events: none;
         }
 
-        /* Sidebar Scrollable Area */
+        /* Sidebar Scrollable Area - Fixed for Mobile Touch Scroll */
         .zoom-sidebar {
-            overflow-y: auto;
             flex: 1;
+            overflow-y: auto;
             padding: 10px 0;
             -webkit-overflow-scrolling: touch;
+            touch-action: pan-y;
         }
 
         /* Zoom Category Header */
@@ -169,7 +171,7 @@
 
         /* Individual Channel Row */
         .channel-item {
-            padding: 12px 20px;
+            padding: 14px 20px; /* Bigger touch target for mobile */
             border-bottom: 1px solid #1e2530;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -214,8 +216,8 @@
             border: none;
             color: #4a5768;
             cursor: pointer;
-            font-size: 16px;
-            padding: 5px;
+            font-size: 18px;
+            padding: 5px 10px; /* Better touch area */
         }
         .fav-star-btn.starred {
             color: #ffcc00 !important;
@@ -223,22 +225,34 @@
 
         /* Mobile Optimized Layout Rules */
         @media (max-width: 768px) {
+            body {
+                overflow: auto; /* Allow natural scrolling if needed */
+            }
             .main-container {
                 flex-direction: column;
+                height: auto;
+                overflow: visible;
             }
             .player-section {
                 order: 1;
                 flex: none;
                 width: 100%;
                 aspect-ratio: 16 / 9;
+                position: sticky; /* Keep the video locked at top while scrolling channels */
+                top: 0;
+                z-index: 100;
             }
             .playlist-section {
                 order: 2;
                 max-width: 100%;
                 min-width: 100%;
-                flex: 1;
+                flex: none;
                 border-right: none;
                 border-top: 2px solid #242c3d;
+                overflow: visible;
+            }
+            .zoom-sidebar {
+                overflow-y: visible; /* Let container scroll naturally on mobile */
             }
             header {
                 font-size: 18px;
@@ -249,7 +263,6 @@
 </head>
 <body>
 
-    <!-- চাইনিজ লেখা সম্পূর্ণ রিমুভ করা হয়েছে -->
     <header>📺 রাজু'র ফ্রি আইপি টিভি</header>
 
     <div class="main-container">
@@ -271,7 +284,6 @@
 
         <!-- Video Player Section -->
         <div class="player-section">
-            <!-- অটো সাউন্ড এনাবল করার জন্য muted ট্যাগ ফেলে দেওয়া হয়েছে -->
             <video id="my-video" class="video-js vjs-default-skin vjs-big-play-centered" controls autoplay playsinline preload="auto" data-setup="{}">
                 <p class="vjs-no-js">
                     To view this video please enable JavaScript
@@ -337,7 +349,6 @@
                     renderSidebar(searchInput.value.trim());
                 });
                 
-                // প্রথম চ্যানেলের সোর্স সেটআপ (মোবাইল সাউন্ড ফিক্স ট্রিক)
                 if(allChannels.length > 0) {
                     firstChannelUrl = allChannels[0].url;
                     setTimeout(() => {
@@ -351,12 +362,10 @@
             }
         }
 
-        // স্ক্রিনে ইউজারের প্রথম স্পর্শেই সাউন্ডসহ অটো-প্লে চালু করার গ্লোবাল লিসেনার
         function enableUnmutedAutoplay() {
             if (player.src() !== "") {
                 player.muted(false);
                 player.play().catch(err => console.log("User gesture triggered play"));
-                // একবার সাউন্ড অন হয়ে গেলে এই লিসেনার রিমুভ করে দেওয়া হবে
                 document.removeEventListener('click', enableUnmutedAutoplay);
                 document.removeEventListener('touchstart', enableUnmutedAutoplay);
             }
@@ -442,7 +451,6 @@
                     document.querySelectorAll('.channel-item').forEach(el => el.classList.remove('active'));
                     li.classList.add('active');
 
-                    // সাউন্ডসহ নতুন চ্যানেল প্লে
                     player.src({ src: channel.url, type: 'application/x-mpegURL' });
                     player.muted(false); 
                     player.play().catch(error => {
