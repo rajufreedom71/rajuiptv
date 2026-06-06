@@ -43,7 +43,7 @@
             flex-direction: row;
         }
         
-        /* Sidebar Section (LEFT) */
+        /* Sidebar Section */
         .playlist-section {
             display: flex;
             flex-direction: column;
@@ -81,7 +81,7 @@
             border-bottom: 1px solid #2e384e;
         }
         
-        /* Search Box Styling like Zoom */
+        /* Search Box */
         .search-box-container {
             padding: 10px 15px;
             background-color: #1e2530;
@@ -100,7 +100,7 @@
             transition: border-color 0.2s;
         }
         .search-input:focus {
-            border-color: #0e71eb;
+            border-color: #00ffcc;
         }
         .search-icon {
             position: absolute;
@@ -112,16 +112,16 @@
             pointer-events: none;
         }
 
-        /* Sidebar Scrollable Area - Fixed for Mobile Touch Scroll */
+        /* Sidebar Scrollable Area */
         .zoom-sidebar {
             flex: 1;
             overflow-y: auto;
-            padding: 10px 0;
+            padding: 5px 0;
             -webkit-overflow-scrolling: touch;
             touch-action: pan-y;
         }
 
-        /* Zoom Category Header */
+        /* Category Header */
         .zoom-category-header {
             width: 100%;
             background: transparent;
@@ -135,6 +135,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            border-bottom: 1px solid #1f2633;
             transition: background 0.2s, color 0.2s;
         }
         .zoom-category-header:hover {
@@ -147,23 +148,26 @@
             width: 12px;
         }
         .zoom-category-header.expanded {
-            color: #ffffff;
+            color: #00ffcc;
+            background-color: #1f2633;
+            border-bottom: none;
         }
         .zoom-category-header.expanded i.arrow {
             transform: rotate(90deg);
         }
 
-        /* Favorites Folder Unique Header Color */
+        /* Favorites Folder */
         .fav-header {
             color: #ffcc00 !important;
         }
 
-        /* Channel Sub-list */
+        /* Channel Sub-list (গার্লিস চড়া নীল কালার পরিবর্তন করে সফট লাইট ডার্ক থিম দেওয়া হয়েছে) */
         .zoom-channel-sublist {
             list-style: none;
             display: none;
-            background-color: #151922;
-            padding-left: 15px;
+            background-color: #141822; /* হালকা সফট ব্যাকগ্রাউন্ড */
+            border-left: 3px solid #242c3d;
+            margin-left: 10px;
         }
         .zoom-channel-sublist.show {
             display: block;
@@ -171,8 +175,8 @@
 
         /* Individual Channel Row */
         .channel-item {
-            padding: 14px 20px; /* Bigger touch target for mobile */
-            border-bottom: 1px solid #1e2530;
+            padding: 12px 20px;
+            border-bottom: 1px solid #1a202c;
             cursor: pointer;
             transition: all 0.2s ease;
             display: flex;
@@ -182,14 +186,19 @@
             position: relative;
         }
         .channel-item:hover {
-            background-color: #242c3d;
+            background-color: #1f2633;
             color: #00ffcc;
         }
+        
+        /* চলমান বা অ্যাক্টিভ চ্যানেলের প্রিমিয়াম লুক */
         .channel-item.active {
-            background-color: #0e71eb;
-            color: #ffffff;
+            background: linear-gradient(90deg, #1d2b3a, #151e29);
+            color: #00ffcc;
             font-weight: bold;
+            border-left: 3px solid #00ffcc; /* সুন্দর নিয়ন সায়ান বর্ডার */
+            box-shadow: inset 5px 0 10px rgba(0, 255, 204, 0.05);
         }
+        
         .channel-icon {
             width: 24px;
             height: 24px;
@@ -204,11 +213,11 @@
             color: #fff;
         }
         .channel-item.active .channel-icon {
-            background-color: rgba(255, 255, 255, 0.2);
-            color: #ffffff;
+            background-color: #00ffcc;
+            color: #11141a;
         }
 
-        /* Favorite Star Button Style */
+        /* Favorite Star Button */
         .fav-star-btn {
             position: absolute;
             right: 20px;
@@ -216,17 +225,17 @@
             border: none;
             color: #4a5768;
             cursor: pointer;
-            font-size: 18px;
-            padding: 5px 10px; /* Better touch area */
+            font-size: 16px;
+            padding: 5px;
         }
         .fav-star-btn.starred {
             color: #ffcc00 !important;
         }
 
-        /* Mobile Optimized Layout Rules */
+        /* Mobile Layout */
         @media (max-width: 768px) {
             body {
-                overflow: auto; /* Allow natural scrolling if needed */
+                overflow: auto;
             }
             .main-container {
                 flex-direction: column;
@@ -238,9 +247,10 @@
                 flex: none;
                 width: 100%;
                 aspect-ratio: 16 / 9;
-                position: sticky; /* Keep the video locked at top while scrolling channels */
+                position: sticky;
                 top: 0;
                 z-index: 100;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.5);
             }
             .playlist-section {
                 order: 2;
@@ -252,7 +262,7 @@
                 overflow: visible;
             }
             .zoom-sidebar {
-                overflow-y: visible; /* Let container scroll naturally on mobile */
+                overflow-y: visible;
             }
             header {
                 font-size: 18px;
@@ -391,17 +401,19 @@
                 groupedChannels[channel.category].push(channel);
             });
 
+            // সার্চ করলে ক্যাটাগরি ফোল্ডার অটো ওপেন হবে, নরমালি বন্ধ থাকবে
+            const shouldExpandAll = keyword !== "";
+
             if (favChannels.length > 0) {
                 const filteredFavs = favChannels.filter(c => c.name.toLowerCase().includes(keyword));
                 if (filteredFavs.length > 0 || !keyword) {
-                    createCategorySection("⭐ Favorites", filteredFavs, true);
+                    createCategorySection("⭐ Favorites", filteredFavs, true); // Favorites ফোল্ডারটি শুধু ওপেন থাকবে সুবিধার জন্য
                 }
             }
 
             Object.keys(groupedChannels).forEach(categoryName => {
                 if (groupedChannels[categoryName].length > 0) {
-                    const shouldExpand = keyword !== ""; 
-                    createCategorySection(categoryName, groupedChannels[categoryName], shouldExpand);
+                    createCategorySection(categoryName, groupedChannels[categoryName], shouldExpandAll);
                 }
             });
 
@@ -473,12 +485,6 @@
                 });
 
                 subListUl.appendChild(li);
-
-                if (player.src() === "" && !isExpandedByDefault) {
-                    li.classList.add('active');
-                    headerBtn.classList.add('expanded');
-                    subListUl.classList.add('show');
-                }
             });
 
             headerBtn.addEventListener('click', () => {
