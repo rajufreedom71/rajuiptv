@@ -6,6 +6,8 @@
     <title>Free IPTV by RAJU</title>
     <!-- Video.js CSS -->
     <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
+    <!-- New Premium Quality Menu CSS (ইউটিউব স্টাইল গিয়ার আইকন) -->
+    <link href="https://cdn.jsdelivr.net/npm/videojs-quality-menu@1.1.2/dist/videojs-quality-menu.css" rel="stylesheet">
     <!-- Google Fonts for Smart Typography -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
     <!-- FontAwesome for Zoom Style Arrows & Stars -->
@@ -78,6 +80,12 @@
         .video-js {
             width: 100% !important;
             height: 100% !important;
+        }
+
+        /* Quality Menu Icon Styling Customization */
+        .vjs-quality-menu .vjs-quality-menu-button:before {
+            font-family: VideoJS;
+            content: "\f110"; /* Premium gear icon */
         }
         
         /* Search Box Container */
@@ -155,13 +163,8 @@
             transform: rotate(90deg);
         }
 
-        /* Special Colors for Master Folders */
-        .all-header {
-            color: #00ffcc !important;
-        }
-        .fav-header {
-            color: #ffcc00 !important;
-        }
+        .all-header { color: #00ffcc !important; }
+        .fav-header { color: #ffcc00 !important; }
 
         /* Channel Sub-list Container */
         .zoom-channel-sublist {
@@ -192,7 +195,6 @@
             color: #f5b041;
         }
         
-        /* Active Running Channel Accent */
         .channel-item.active {
             background: linear-gradient(90deg, #1d2b3a, #151e29);
             color: #f5b041;
@@ -219,7 +221,6 @@
             color: #11141a;
         }
 
-        /* Favorite Star Button */
         .fav-star-btn {
             position: absolute;
             right: 20px;
@@ -234,47 +235,17 @@
             color: #ffcc00 !important;
         }
 
-        /* Custom Styles to ensure quality menu looks good */
-        .vjs-quality-selector .vjs-menu-button {
-            margin-right: 5px;
-        }
-
         /* Mobile Responsive Configurations */
         @media (max-width: 768px) {
-            body {
-                overflow: auto;
-            }
-            .main-container {
-                flex-direction: column;
-                height: auto;
-                overflow: visible;
-            }
+            body { overflow: auto; }
+            .main-container { flex-direction: column; height: auto; overflow: visible; }
             .player-section {
-                order: 1;
-                flex: none;
-                width: 100%;
-                aspect-ratio: 16 / 9;
-                position: sticky;
-                top: 0;
-                z-index: 100;
-                box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+                order: 1; flex: none; width: 100%; aspect-ratio: 16 / 9;
+                position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
             }
-            .playlist-section {
-                order: 2;
-                max-width: 100%;
-                min-width: 100%;
-                flex: none;
-                border-right: none;
-                border-top: 2px solid #242c3d;
-                overflow: visible;
-            }
-            .zoom-sidebar {
-                overflow-y: visible;
-            }
-            header {
-                font-size: 22px;
-                padding: 14px;
-            }
+            .playlist-section { order: 2; max-width: 100%; min-width: 100%; flex: none; border-right: none; border-top: 2px solid #242c3d; overflow: visible; }
+            .zoom-sidebar { overflow-y: visible; }
+            header { font-size: 22px; padding: 14px; }
         }
     </style>
 </head>
@@ -285,13 +256,11 @@
     <div class="main-container">
         <!-- Sidebar Section -->
         <div class="playlist-section">
-            <!-- Zoom Style Search Bar -->
             <div class="search-box-container">
                 <i class="fa-solid fa-magnifying-glass search-icon"></i>
                 <input type="text" id="search-input" class="search-input" placeholder="Search channels..." />
             </div>
             
-            <!-- Sidebar Vertical Container -->
             <div class="zoom-sidebar" id="zoom-sidebar-container">
                 <div style="padding: 20px; color: #8899a6; text-align: center;" id="loading-text">Loading channels...</div>
             </div>
@@ -299,18 +268,15 @@
 
         <!-- Video Player Section -->
         <div class="player-section">
-            <video id="my-video" class="video-js vjs-default-skin vjs-big-play-centered" controls autoplay playsinline preload="auto" data-setup="{}">
-                <p class="vjs-no-js">
-                    To view this video please enable JavaScript
-                </p>
+            <video id="my-video" class="video-js vjs-default-skin vjs-big-play-centered" controls autoplay playsinline preload="auto">
+                <p class="vjs-no-js">To view this video please enable JavaScript</p>
             </video>
         </div>
     </div>
 
-    <!-- Video.js and Essential Plugins -->
+    <!-- Video.js and Core Quality Menu Extension Libraries -->
     <script src="https://vjs.zencdn.net/7.20.3/video.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-quality-levels@2.1.0/dist/videojs-contrib-quality-levels.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/videojs-hls-quality-selector@3.5.0/dist/videojs-hls-quality-selector.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/videojs-quality-menu@1.1.2/dist/videojs-quality-menu.min.js"></script>
 
     <script>
         const m3uUrl = 'https://raw.githubusercontent.com/rajufreedom71/rajuiptv/main/playlist.m3u';
@@ -321,27 +287,22 @@
         const zoomSidebarContainer = document.getElementById('zoom-sidebar-container');
         const searchInput = document.getElementById('search-input');
 
-        // ডোমে লোড হওয়ার পর সেফ এক্সিকিউশন
         document.addEventListener("DOMContentLoaded", function() {
-            // ১. প্লেয়ার অবজেক্ট তৈরি
-            player = videojs('my-video');
-            
-            // ২. রেজুলুশন সিলেক্টরকে ট্রাই-ক্যাচ (Try-Catch) ব্লকে নেওয়া হলো যেন কোনো এরর দিলেও চ্যানেল লিস্ট লোড বন্ধ না হয়
-            try {
-                if (typeof player.hlsQualitySelector === 'function') {
-                    player.hlsQualitySelector({ displayCurrentQuality: true });
+            // ১. নতুন কোয়ালিটি মেনু প্লাগইন সহ প্লেয়ার ইনিশিয়ালাইজেশন
+            player = videojs('my-video', {
+                plugins: {
+                    qualityMenu: {
+                        default: 'auto',
+                        useStyle: true
+                    }
                 }
-            } catch(e) {
-                console.log("Quality selector extension bypass: ", e);
-            }
-
-            // ৩. ফুলস্ক্রিন ও অটো-রোটেট ইভেন্ট হ্যান্ডলার সেটআপ
+            });
+            
+            // ২. ফুলস্ক্রিন অটো-রোটেট
             player.on('fullscreenchange', function() {
                 if (player.isFullscreen()) {
                     if (screen.orientation && screen.orientation.lock) {
-                        screen.orientation.lock('landscape').catch(function(error) {
-                            console.log("Orientation lock bypassed: ", error);
-                        });
+                        screen.orientation.lock('landscape').catch(function(e){});
                     }
                 } else {
                     if (screen.orientation && screen.orientation.unlock) {
@@ -350,7 +311,7 @@
                 }
             });
 
-            // ৪. এবার নিরাপদভাবে প্লেলিস্ট নিয়ে আসা হচ্ছে
+            // ৩. প্লেলিস্ট ফেচ করা
             fetchAndParseM3U();
         });
 
@@ -389,7 +350,6 @@
                     }
                 }
 
-                // চ্যানেল সাইডবার রেন্ডার করা হচ্ছে
                 renderSidebar();
 
                 searchInput.addEventListener('input', () => {
@@ -410,9 +370,7 @@
             const groupedChannels = {};
             
             allChannels.forEach(channel => {
-                if (keyword && !channel.name.toLowerCase().includes(keyword)) {
-                    return;
-                }
+                if (keyword && !channel.name.toLowerCase().includes(keyword)) return;
                 
                 if (!groupedChannels[channel.category]) {
                     groupedChannels[channel.category] = [];
@@ -422,12 +380,10 @@
 
             const shouldExpandAll = keyword !== "";
 
-            // মাস্টার ফোল্ডার: All Channels
             if (allChannels.length > 0 && !keyword) {
                 createCategorySection("🌐 All Channels", allChannels, false, "all-header");
             }
 
-            // মাস্টার ফোল্ডার: Favorites
             if (favChannels.length > 0) {
                 const filteredFavs = favChannels.filter(c => c.name.toLowerCase().includes(keyword));
                 if (filteredFavs.length > 0 || !keyword) {
@@ -435,7 +391,6 @@
                 }
             }
 
-            // নরমাল ক্যাটাগরিগুলো
             Object.keys(groupedChannels).forEach(categoryName => {
                 if (groupedChannels[categoryName].length > 0) {
                     createCategorySection(categoryName, groupedChannels[categoryName], shouldExpandAll);
@@ -450,9 +405,7 @@
         function createCategorySection(categoryName, channels, isExpandedByDefault = false, specialClass = "") {
             const headerBtn = document.createElement('button');
             headerBtn.className = 'zoom-category-header';
-            if (specialClass) {
-                headerBtn.classList.add(specialClass);
-            }
+            if (specialClass) headerBtn.classList.add(specialClass);
             headerBtn.innerHTML = `<i class="fa-solid fa-chevron-right arrow"></i> <i class="fa-regular fa-folder"></i> ${categoryName} (${channels.length})`;
             
             const subListUl = document.createElement('ul');
@@ -477,7 +430,7 @@
                 li.innerHTML = `
                     <div class="channel-icon">${firstLetter}</div>
                     <div style="flex: 1; padding-right: 30px;">${channel.name}</div>
-                    <button class="fav-star-btn ${isStarred ? 'starred' : ''}" title="${isStarred ? 'Remove from Fav' : 'Add to Fav'}">
+                    <button class="fav-star-btn ${isStarred ? 'starred' : ''}">
                         <i class="${isStarred ? 'fa-solid' : 'fa-regular'} fa-star"></i>
                     </button>
                 `;
@@ -489,22 +442,17 @@
                     li.classList.add('active');
 
                     player.src({ src: channel.url, type: 'application/x-mpegURL' });
-                    player.muted(false); 
-                    player.play().catch(error => {
-                        console.log("Play error:", error);
-                    });
+                    player.play().catch(error => console.log("Play error:", error));
                 });
 
                 const starBtn = li.querySelector('.fav-star-btn');
                 starBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    
                     if (favoriteChannelUrls.includes(channel.url)) {
                         favoriteChannelUrls = favoriteChannelUrls.filter(url => url !== channel.url);
                     } else {
                         favoriteChannelUrls.push(channel.url);
                     }
-                    
                     localStorage.setItem('fav_channels', JSON.stringify(favoriteChannelUrls));
                     renderSidebar(searchInput.value.trim());
                 });
