@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RAJU IPTV V2</title>
+<div class="header">📺 Free IPTV by RAJU</div>
 
 <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet"/>
 
@@ -17,19 +17,18 @@ body{
     height:100vh;
 }
 
-/* LEFT PANEL */
+/* SIDEBAR */
 .sidebar{
     width:360px;
     background:#141824;
+    border-right:1px solid #222;
     display:flex;
     flex-direction:column;
-    border-right:1px solid #222;
 }
 
-/* HEADER */
+/* TITLE (DO NOT CHANGE TEXT) */
 .header{
-    padding:15px;
-    font-size:18px;
+    padding:14px;
     font-weight:bold;
     border-bottom:1px solid #222;
 }
@@ -46,15 +45,27 @@ body{
     border-radius:8px;
     background:#1f2433;
     color:white;
-    outline:none;
 }
 
-/* CATEGORY */
+/* CATEGORY (COLLAPSIBLE) */
+.catHeader{
+    padding:10px;
+    cursor:pointer;
+    background:#1b2030;
+    font-weight:bold;
+    border-top:1px solid #222;
+    border-bottom:1px solid #222;
+}
+
 .catBox{
-    display:flex;
+    display:none;
     flex-wrap:wrap;
     padding:10px;
     gap:6px;
+}
+
+.catBox.open{
+    display:flex;
 }
 
 .cat{
@@ -70,7 +81,15 @@ body{
     color:black;
 }
 
-/* LIST */
+/* FAVORITES */
+.favHeader{
+    padding:10px;
+    font-weight:bold;
+    background:#1b2030;
+    border-top:1px solid #222;
+    border-bottom:1px solid #222;
+}
+
 .list{
     flex:1;
     overflow:auto;
@@ -79,6 +98,7 @@ body{
 .item{
     display:flex;
     align-items:center;
+    justify-content:space-between;
     gap:10px;
     padding:10px;
     cursor:pointer;
@@ -94,13 +114,25 @@ body{
     color:black;
 }
 
+.left{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
 .item img{
     width:34px;
     height:34px;
     border-radius:50%;
 }
 
-/* RIGHT PLAYER */
+.star{
+    cursor:pointer;
+    font-size:18px;
+    user-select:none;
+}
+
+/* PLAYER (FIXED SIZE) */
 .player{
     flex:1;
     position:relative;
@@ -110,6 +142,14 @@ body{
     justify-content:center;
 }
 
+/* FIXED CONTAINER (NO RESIZE BUG) */
+.videoWrap{
+    width:100%;
+    height:100%;
+    max-width:100%;
+    max-height:100%;
+}
+
 .now{
     position:absolute;
     top:10px;
@@ -117,22 +157,30 @@ body{
     background:rgba(0,0,0,0.6);
     padding:8px 12px;
     border-radius:6px;
-    font-size:14px;
     z-index:10;
+}
+
+/* QUALITY BUTTON */
+.qualityBox{
+    position:absolute;
+    top:10px;
+    right:10px;
+    z-index:10;
+}
+
+.qualityBox select{
+    background:#1f2433;
+    color:white;
+    border:none;
+    padding:6px;
+    border-radius:6px;
 }
 
 /* RESPONSIVE */
 @media(max-width:768px){
-    body{
-        flex-direction:column;
-    }
-    .sidebar{
-        width:100%;
-        height:45%;
-    }
-    .player{
-        height:55%;
-    }
+    body{flex-direction:column;}
+    .sidebar{width:100%;height:45%;}
+    .player{height:55%;}
 }
 </style>
 </head>
@@ -140,20 +188,38 @@ body{
 <body>
 
 <div class="sidebar">
+
     <div class="header">📺 RAJU IPTV V2</div>
 
     <div class="search">
         <input id="search" placeholder="Search channel...">
     </div>
 
+    <div class="catHeader" id="catToggle">📂 Categories (Click to Expand)</div>
     <div class="catBox" id="cats"></div>
 
+    <div class="favHeader">⭐ Favorites</div>
+    <div class="list" id="favList"></div>
+
+    <div class="favHeader">📺 Channels</div>
     <div class="list" id="list"></div>
+
 </div>
 
 <div class="player">
+
     <div class="now" id="now">▶ Select Channel</div>
-    <video id="video" class="video-js vjs-big-play-centered" controls autoplay></video>
+
+    <div class="qualityBox">
+        <select id="quality">
+            <option value="auto">Auto</option>
+        </select>
+    </div>
+
+    <div class="videoWrap">
+        <video id="video" class="video-js vjs-big-play-centered" controls autoplay></video>
+    </div>
+
 </div>
 
 <script src="https://vjs.zencdn.net/7.20.3/video.js"></script>
@@ -161,18 +227,24 @@ body{
 <script>
 
 const player = videojs('video');
+
 const url = "https://raw.githubusercontent.com/rajufreedom71/rajuiptv/main/playlist.m3u";
 
 let data = [];
-let filtered = [];
-let category = "All";
+let favorites = JSON.parse(localStorage.getItem("fav")||"[]");
 
 const list = document.getElementById("list");
+const favList = document.getElementById("favList");
 const cats = document.getElementById("cats");
 const search = document.getElementById("search");
 const now = document.getElementById("now");
 
-/* LOAD M3U */
+/* CATEGORY TOGGLE (ZOOM STYLE COLLAPSE) */
+document.getElementById("catToggle").onclick = ()=>{
+    cats.classList.toggle("open");
+};
+
+/* LOAD */
 async function load(){
     const res = await fetch(url);
     const text = await res.text();
@@ -185,22 +257,20 @@ async function load(){
             const name = lines[i].split(",")[1] || "Unknown";
 
             const group = (lines[i].match(/group-title="(.*?)"/)||[])[1] || "Others";
-            const logo = (lines[i].match(/tvg-logo="(.*?)"/)||[])[1] 
+            const logo = (lines[i].match(/tvg-logo="(.*?)"/)||[])[1]
             || "https://cdn-icons-png.flaticon.com/512/1041/1041916.png";
 
             const link = lines[i+1];
 
-            if(link && link.startsWith("http")){
-                const key = name+link;
-                temp[key] = {name, group, logo, link};
-            }
+            const key = name+link;
+            temp[key] = {name,group,logo,link};
         }
     }
 
     data = Object.values(temp);
 
     renderCats();
-    renderList(data);
+    render();
 }
 
 /* CATEGORIES */
@@ -211,14 +281,11 @@ function renderCats(){
 
     groups.forEach(g=>{
         const d = document.createElement("div");
-        d.className = "cat"+(g==="All"?" active":"");
+        d.className = "cat";
         d.textContent = g;
 
         d.onclick = ()=>{
-            document.querySelectorAll(".cat").forEach(c=>c.classList.remove("active"));
-            d.classList.add("active");
-            category = g;
-            filter();
+            filter(g);
         };
 
         cats.appendChild(d);
@@ -226,59 +293,106 @@ function renderCats(){
 }
 
 /* FILTER */
-function filter(){
-    let listData = data;
+let currentCat = "All";
 
-    if(category !== "All"){
-        listData = listData.filter(x=>x.group === category);
+function filter(g){
+    currentCat = g;
+    render();
+}
+
+/* RENDER */
+function render(){
+
+    let arr = data;
+
+    if(currentCat !== "All"){
+        arr = arr.filter(x=>x.group === currentCat);
     }
 
     const key = search.value.toLowerCase();
     if(key){
-        listData = listData.filter(x=>x.name.toLowerCase().includes(key));
+        arr = arr.filter(x=>x.name.toLowerCase().includes(key));
     }
 
-    filtered = listData;
-    renderList(listData);
-}
-
-/* RENDER LIST */
-function renderList(arr){
     list.innerHTML = "";
 
     arr.forEach(ch=>{
         const d = document.createElement("div");
         d.className = "item";
 
+        const isFav = favorites.includes(ch.link);
+
         d.innerHTML = `
-            <img src="${ch.logo}">
-            <div>${ch.name}</div>
+            <div class="left">
+                <img src="${ch.logo}">
+                <div>${ch.name}</div>
+            </div>
+            <div class="star">${isFav ? "⭐" : "☆"}</div>
         `;
 
         d.onclick = ()=>{
-            document.querySelectorAll(".item").forEach(i=>i.classList.remove("active"));
-            d.classList.add("active");
+            play(ch);
+        };
 
-            player.src({src:ch.link,type:"application/x-mpegURL"});
-            player.play();
-
-            now.innerText = "▶ Now Playing: " + ch.name;
-
-            localStorage.setItem("last", JSON.stringify(ch));
+        d.querySelector(".star").onclick = (e)=>{
+            e.stopPropagation();
+            toggleFav(ch);
         };
 
         list.appendChild(d);
     });
 
-    /* auto restore last */
-    const last = JSON.parse(localStorage.getItem("last")||"null");
-    if(last){
-        now.innerText = "▶ Last: " + last.name;
+    renderFav();
+}
+
+/* FAVORITE */
+function toggleFav(ch){
+    if(favorites.includes(ch.link)){
+        favorites = favorites.filter(x=>x!==ch.link);
+    }else{
+        favorites.push(ch.link);
     }
+    localStorage.setItem("fav", JSON.stringify(favorites));
+    render();
+}
+
+/* FAVORITE LIST */
+function renderFav(){
+    favList.innerHTML = "";
+
+    data.filter(x=>favorites.includes(x.link)).forEach(ch=>{
+        const d = document.createElement("div");
+        d.className = "item";
+
+        d.innerHTML = `
+            <div class="left">
+                <img src="${ch.logo}">
+                <div>${ch.name}</div>
+            </div>
+            <div class="star">⭐</div>
+        `;
+
+        d.onclick = ()=>play(ch);
+
+        favList.appendChild(d);
+    });
+}
+
+/* PLAY */
+function play(ch){
+
+    document.querySelectorAll(".item").forEach(i=>i.classList.remove("active"));
+
+    player.src({src:ch.link,type:"application/x-mpegURL"});
+    player.play();
+
+    now.innerText = "▶ Now Playing: " + ch.name;
+
+    localStorage.setItem("last", JSON.stringify(ch));
 }
 
 /* SEARCH */
-search.addEventListener("input", filter);
+search.addEventListener("input", render);
 
 load();
 
