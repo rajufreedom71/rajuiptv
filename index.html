@@ -295,7 +295,7 @@
             
             <!-- Sidebar Vertical Container -->
             <div class="zoom-sidebar" id="zoom-sidebar-container">
-                <!-- Data will load here dynamically -->
+                <div style="padding: 20px; color: #8899a6; text-align: center;" id="loading-text">Loading channels...</div>
             </div>
         </div>
 
@@ -309,47 +309,50 @@
         </div>
     </div>
 
-    <!-- Video.js and Essential Quality Plugins -->
+    <!-- Video.js and Essential Quality Plugins (Correct Order Restored) -->
     <script src="https://vjs.zencdn.net/7.20.3/video.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-quality-levels@2.1.0/dist/videojs-contrib-quality-levels.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/videojs-hls-quality-selector@3.5.0/dist/videojs-hls-quality-selector.min.js"></script>
 
     <script>
         const m3uUrl = 'https://raw.githubusercontent.com/rajufreedom71/rajuiptv/main/playlist.m3u';
+        let player;
+        let allChannels = [];
+        let favoriteChannelUrls = JSON.parse(localStorage.getItem('fav_channels')) || [];
         
-        const player = videojs('my-video');
-        
-        // রেজুলুশন সিলেক্টর প্লাগইন চালু করা হলো
-        player.hlsQualitySelector({
-            displayCurrentQuality: true,
-        });
-
-        // মোবাইল স্ক্রিন অটো-রোটেট স্ক্রিপ্ট (Fullscreen Handler)
-        player.on('fullscreenchange', function() {
-            if (player.isFullscreen()) {
-                // ফুলস্ক্রিন হলে স্ক্রিন ল্যান্ডস্কেপ (আড়াআড়ি) হয়ে যাবে
-                if (screen.orientation && screen.orientation.lock) {
-                    screen.orientation.lock('landscape').catch(function(error) {
-                        console.log("Orientation lock ignored/failed: ", error);
-                    });
-                } else if (screen.lockOrientation) {
-                    screen.lockOrientation('landscape');
-                }
-            } else {
-                // ফুলস্ক্রিন থেকে বের হলে আবার সোজা (Portrait) হয়ে যাবে
-                if (screen.orientation && screen.orientation.unlock) {
-                    screen.orientation.unlock();
-                } else if (screen.unlockOrientation) {
-                    screen.unlockOrientation();
-                }
-            }
-        });
-
         const zoomSidebarContainer = document.getElementById('zoom-sidebar-container');
         const searchInput = document.getElementById('search-input');
 
-        let allChannels = [];
-        let favoriteChannelUrls = JSON.parse(localStorage.getItem('fav_channels')) || [];
+        // ডোমে সবকিছু সঠিকভাবে রেডি হওয়ার পর স্ক্রিপ্টগুলো একজিকিউট হবে
+        document.addEventListener("DOMContentLoaded", function() {
+            // ১. প্রথমে প্লেয়ার অবজেক্ট তৈরি করা হলো
+            player = videojs('my-video');
+            
+            // ২. রেজুলুশন সিলেক্টর সাকসেসফুলি ইনজেক্ট করা হলো
+            try {
+                player.hlsQualitySelector({ displayCurrentQuality: true });
+            } catch(e) {
+                console.log("Quality selector failed to initialize, but continuing...", e);
+            }
+
+            // ৩. ফুলস্ক্রিন ও অটো-রোটেট ইভেন্ট হ্যান্ডলার সেটআপ
+            player.on('fullscreenchange', function() {
+                if (player.isFullscreen()) {
+                    if (screen.orientation && screen.orientation.lock) {
+                        screen.orientation.lock('landscape').catch(function(error) {
+                            console.log("Orientation lock failed: ", error);
+                        });
+                    }
+                } else {
+                    if (screen.orientation && screen.orientation.unlock) {
+                        screen.orientation.unlock();
+                    }
+                }
+            });
+
+            // ৪. এবার নিরাপদভাবে প্লেলিস্ট লোড করার ফাংশন কল করা হলো
+            fetchAndParseM3U();
+        });
 
         async function fetchAndParseM3U() {
             try {
@@ -359,6 +362,7 @@
                 
                 const lines = text.split('\n');
                 let currentChannel = null;
+                allChannels = []; // ক্লিয়ার করে নেওয়া হলো
 
                 for (let i = 0; i < lines.length; i++) {
                     const line = lines[i].trim();
@@ -385,6 +389,7 @@
                     }
                 }
 
+                // চ্যানেল রেন্ডার করা হচ্ছে
                 renderSidebar();
 
                 searchInput.addEventListener('input', () => {
@@ -417,12 +422,12 @@
 
             const shouldExpandAll = keyword !== "";
 
-            // ১. "All Channels" ফোল্ডার
+            // মাস্টার ফোল্ডার: All Channels
             if (allChannels.length > 0 && !keyword) {
                 createCategorySection("🌐 All Channels", allChannels, false, "all-header");
             }
 
-            // ২. Favorites ফোল্ডার
+            // মাস্টার ফোল্ডার: Favorites
             if (favChannels.length > 0) {
                 const filteredFavs = favChannels.filter(c => c.name.toLowerCase().includes(keyword));
                 if (filteredFavs.length > 0 || !keyword) {
@@ -430,7 +435,7 @@
                 }
             }
 
-            // ৩. বাকি ক্যাটাগরিগুলো
+            // নরমাল ক্যাটাগরিগুলো
             Object.keys(groupedChannels).forEach(categoryName => {
                 if (groupedChannels[categoryName].length > 0) {
                     createCategorySection(categoryName, groupedChannels[categoryName], shouldExpandAll);
@@ -462,7 +467,7 @@
                 const li = document.createElement('li');
                 li.className = 'channel-item';
                 
-                if (player.src() === channel.url) {
+                if (player && player.src() === channel.url) {
                     li.classList.add('active');
                 }
                 
@@ -521,8 +526,6 @@
             zoomSidebarContainer.appendChild(headerBtn);
             zoomSidebarContainer.appendChild(subListUl);
         }
-
-        window.onload = fetchAndParseM3U;
     </script>
 </body>
 </html>
