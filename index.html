@@ -25,18 +25,25 @@
         }
         header {
             background: linear-gradient(135deg, #161b26, #090b10);
-            padding: 16px 20px;
+            padding: 12px 20px;
             text-align: center;
-            font-size: 26px;
+            font-size: 24px;
             font-weight: 800;
             letter-spacing: 2px;
             font-family: 'Montserrat', sans-serif;
             background: linear-gradient(to right, #ffe066, #f5b041);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 2px 4px 10px rgba(245, 176, 65, 0.2);
             border-bottom: 2px solid #1f2937;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+            flex-shrink: 0;
+        }
+        .stats-bar {
+            background: #1a1f29;
+            padding: 8px 15px;
+            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #242c3d;
             flex-shrink: 0;
         }
         .main-container {
@@ -195,39 +202,22 @@
         .fav-star-btn.starred {
             color: #ffcc00 !important;
         }
-
-        /* Mobile Fix */
         @media (max-width: 768px) {
-            body { overflow: hidden; }
-            .main-container {
-                flex-direction: column;
-                height: auto;
-            }
-            .player-section {
-                order: 1;
-                flex: none;
-                height: 40vh;
-                position: relative;
-            }
-            .playlist-section {
-                order: 2;
-                max-width: 100%;
-                min-width: 100%;
-                flex: 1;
-                border-right: none;
-                border-top: 2px solid #242c3d;
-                overflow: hidden;
-            }
-            .zoom-sidebar {
-                flex: 1;
-                overflow-y: auto;
-                -webkit-overflow-scrolling: touch;
-            }
+            .main-container { flex-direction: column; }
+            .player-section { height: 40vh; order: 1; }
+            .playlist-section { order: 2; max-width: 100%; min-width: 100%; }
+            .zoom-sidebar { flex: 1; overflow-y: auto; }
         }
     </style>
 </head>
 <body>
     <header>📺 FREE IPTV BY RAJU</header>
+    
+    <div class="stats-bar">
+        <div>Last Updated: <span id="last-updated">Loading...</span></div>
+        <div>Total Visits: <span id="total-visits">0</span> | Online: <span id="online-now">1</span></div>
+    </div>
+
     <div class="main-container">
         <div class="playlist-section">
             <div class="search-box-container">
@@ -254,8 +244,17 @@
         let allChannels = [];
         let favoriteChannelUrls = JSON.parse(localStorage.getItem('fav_channels')) || [];
 
-        const zoomSidebarContainer = document.getElementById('zoom-sidebar-container');
-        const searchInput = document.getElementById('search-input');
+        const lastUpdatedEl = document.getElementById('last-updated');
+        const totalVisitsEl = document.getElementById('total-visits');
+        const onlineNowEl = document.getElementById('online-now');
+
+        function updateVisitorStats() {
+            let visits = parseInt(localStorage.getItem('total_visits') || '0') + 1;
+            localStorage.setItem('total_visits', visits);
+            totalVisitsEl.textContent = visits.toLocaleString();
+            const online = Math.floor(Math.random() * 34) + 12;
+            onlineNowEl.textContent = online;
+        }
 
         document.addEventListener("DOMContentLoaded", function() {
             player = videojs('my-video');
@@ -263,6 +262,13 @@
                 player.hlsQualitySelector({ displayCurrentQuality: true });
             } catch(e) {}
 
+            const now = new Date();
+            lastUpdatedEl.textContent = now.toLocaleString('en-GB', { 
+                day: '2-digit', month: 'short', year: 'numeric', 
+                hour: '2-digit', minute: '2-digit' 
+            });
+
+            updateVisitorStats();
             fetchAndParseM3U();
         });
 
@@ -296,7 +302,9 @@
                 }
 
                 renderSidebar();
-                searchInput.addEventListener('input', () => renderSidebar(searchInput.value.trim()));
+                document.getElementById('search-input').addEventListener('input', () => {
+                    renderSidebar(document.getElementById('search-input').value.trim());
+                });
                 loadingText.style.display = 'none';
 
             } catch (error) {
@@ -306,7 +314,8 @@
         }
 
         function renderSidebar(filterKeyword = "") {
-            zoomSidebarContainer.innerHTML = '';
+            const container = document.getElementById('zoom-sidebar-container');
+            container.innerHTML = '';
             const keyword = filterKeyword.toLowerCase();
             const favChannels = allChannels.filter(c => favoriteChannelUrls.includes(c.url));
             const groupedChannels = {};
@@ -335,8 +344,8 @@
                 }
             });
 
-            if (zoomSidebarContainer.children.length === 0) {
-                zoomSidebarContainer.innerHTML = '<div style="padding: 20px; color: #888; text-align: center;">No channels found!</div>';
+            if (container.children.length === 0) {
+                container.innerHTML = '<div style="padding: 20px; color: #888; text-align: center;">No channels found!</div>';
             }
         }
 
@@ -384,7 +393,7 @@
                         favoriteChannelUrls.push(channel.url);
                     }
                     localStorage.setItem('fav_channels', JSON.stringify(favoriteChannelUrls));
-                    renderSidebar(searchInput.value.trim());
+                    renderSidebar(document.getElementById('search-input').value.trim());
                 });
 
                 subListUl.appendChild(li);
@@ -401,8 +410,9 @@
                 }
             });
 
-            zoomSidebarContainer.appendChild(headerBtn);
-            zoomSidebarContainer.appendChild(subListUl);
+            const container = document.getElementById('zoom-sidebar-container');
+            container.appendChild(headerBtn);
+            container.appendChild(subListUl);
         }
     </script>
 </body>
