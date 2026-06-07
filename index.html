@@ -27,6 +27,12 @@
     <source src="" type="application/x-mpegURL" />
   </video>
 
+  <!-- EPG Container -->
+  <div id="epgContainer" style="margin-top:20px; border:1px solid #ccc; padding:10px;">
+    <h3>Program Guide</h3>
+    <ul id="epgList"></ul>
+  </div>
+
   <!-- Video.js JS -->
   <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
   <!-- Quality Selector Plugin JS -->
@@ -73,14 +79,39 @@
         if (select.options.length > 0) {
           player.src({ src: select.options[0].value, type: 'application/x-mpegURL' });
           player.play();
+          loadEPG(select.options[0].text.split(" - ")[0]);
         }
 
         // Change channel on selection
         select.addEventListener('change', function() {
           player.src({ src: this.value, type: 'application/x-mpegURL' });
           player.play();
+          const selectedChannel = this.options[this.selectedIndex].text.split(" - ")[0];
+          loadEPG(selectedChannel);
         });
       });
+
+    // Example EPG XML file (replace with your source)
+    const epgUrl = "https://iptv-org.github.io/epg/guides.xml";
+
+    function loadEPG(channelName) {
+      fetch(epgUrl)
+        .then(response => response.text())
+        .then(str => (new window.DOMParser()).parseFromString(str, "text/xml"))
+        .then(data => {
+          const programmes = data.querySelectorAll(`programme[channel="${channelName}"]`);
+          const epgList = document.getElementById("epgList");
+          epgList.innerHTML = "";
+          programmes.forEach(prog => {
+            const start = prog.getAttribute("start");
+            const stop = prog.getAttribute("stop");
+            const title = prog.querySelector("title")?.textContent || "No Title";
+            const li = document.createElement("li");
+            li.textContent = `${start} - ${stop}: ${title}`;
+            epgList.appendChild(li);
+          });
+        });
+    }
   </script>
 
 </body>
