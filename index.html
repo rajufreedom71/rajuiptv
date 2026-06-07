@@ -3,19 +3,15 @@
 <head>
   <meta charset="utf-8">
   <title>Free IPTV by RAJU</title>
-  <!-- Video.js CSS -->
   <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
-  <!-- Quality Selector Plugin CSS -->
   <link href="https://cdn.jsdelivr.net/npm/videojs-http-source-selector@1.1.7/dist/videojs-http-source-selector.css" rel="stylesheet" />
 </head>
 <body>
 
   <h2 style="text-align:center;">Free IPTV by RAJU</h2>
 
-  <!-- Channel Selector -->
   <select id="channelSelect"></select>
 
-  <!-- Video.js Player -->
   <video
     id="my-video"
     class="video-js vjs-default-skin"
@@ -27,27 +23,22 @@
     <source src="" type="application/x-mpegURL" />
   </video>
 
-  <!-- EPG Container -->
   <div id="epgContainer" style="margin-top:20px; border:1px solid #ccc; padding:10px;">
     <h3>Program Guide</h3>
     <ul id="epgList"></ul>
   </div>
 
-  <!-- Video.js JS -->
   <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
-  <!-- Quality Selector Plugin JS -->
   <script src="https://cdn.jsdelivr.net/npm/videojs-http-source-selector@1.1.7/dist/videojs-http-source-selector.min.js"></script>
 
   <script>
     var player = videojs('my-video');
-
-    // Enable resolution selector
     player.httpSourceSelector();
     player.on('ready', function() {
       player.controlBar.addChild('HttpSourceSelector');
     });
 
-    // Load playlist.m3 file
+    // Load playlist.m3u
     fetch('playlist.m3u')
       .then(response => response.text())
       .then(data => {
@@ -58,13 +49,12 @@
           if (line.startsWith('#EXTINF')) {
             const nameMatch = line.match(/,(.*)$/);
             if (nameMatch) currentName = nameMatch[1].trim();
-          } else if (line.startsWith('http')) {
+          } else if (line.startsWith('http') && line.includes('.m3u8')) {
             if (!channels[currentName]) channels[currentName] = [];
             channels[currentName].push(line.trim());
           }
         });
 
-        // Populate dropdown
         const select = document.getElementById('channelSelect');
         Object.keys(channels).forEach(name => {
           channels[name].forEach((url, index) => {
@@ -75,14 +65,12 @@
           });
         });
 
-        // Load first channel
         if (select.options.length > 0) {
           player.src({ src: select.options[0].value, type: 'application/x-mpegURL' });
           player.play();
           loadEPG(select.options[0].text.split(" - ")[0]);
         }
 
-        // Change channel on selection
         select.addEventListener('change', function() {
           player.src({ src: this.value, type: 'application/x-mpegURL' });
           player.play();
@@ -91,7 +79,7 @@
         });
       });
 
-    // Example EPG XML file (replace with your source)
+    // Example EPG XML file
     const epgUrl = "https://iptv-org.github.io/epg/guides.xml";
 
     function loadEPG(channelName) {
