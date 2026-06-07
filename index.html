@@ -27,9 +27,9 @@
             background: linear-gradient(135deg, #161b26, #090b10);
             padding: 12px 20px;
             text-align: center;
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 800;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
             font-family: 'Montserrat', sans-serif;
             background: linear-gradient(to right, #ffe066, #f5b041);
             -webkit-background-clip: text;
@@ -39,11 +39,11 @@
         }
         .stats-bar {
             background: #1a1f29;
-            padding: 8px 15px;
+            padding: 10px 15px;
             font-size: 13px;
             display: flex;
             justify-content: space-between;
-            border-bottom: 1px solid #242c3d;
+            border-top: 1px solid #242c3d;
             flex-shrink: 0;
         }
         .main-container {
@@ -212,12 +212,7 @@
 </head>
 <body>
     <header>📺 FREE IPTV BY RAJU</header>
-    
-    <div class="stats-bar">
-        <div>Last Updated: <span id="last-updated">Loading...</span></div>
-        <div>Total Visits: <span id="total-visits">0</span> | Online: <span id="online-now">1</span></div>
-    </div>
-
+   
     <div class="main-container">
         <div class="playlist-section">
             <div class="search-box-container">
@@ -233,17 +228,20 @@
         </div>
     </div>
 
+    <div class="stats-bar">
+        <div>Last Updated: <span id="last-updated">Loading...</span></div>
+        <div>Total Visits: <span id="total-visits">0</span> | Online: <span id="online-now">1</span></div>
+    </div>
+
     <script src="https://vjs.zencdn.net/7.20.3/video.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-quality-levels@2.1.0/dist/videojs-contrib-quality-levels.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/videojs-hls-quality-selector@3.5.0/dist/videojs-hls-quality-selector.min.js"></script>
-
     <script>
         const m3uUrl = 'https://raw.githubusercontent.com/rajufreedom71/rajuiptv/main/playlist.m3u';
-        
+       
         let player;
         let allChannels = [];
         let favoriteChannelUrls = JSON.parse(localStorage.getItem('fav_channels')) || [];
-
         const lastUpdatedEl = document.getElementById('last-updated');
         const totalVisitsEl = document.getElementById('total-visits');
         const onlineNowEl = document.getElementById('online-now');
@@ -263,9 +261,9 @@
             } catch(e) {}
 
             const now = new Date();
-            lastUpdatedEl.textContent = now.toLocaleString('en-GB', { 
-                day: '2-digit', month: 'short', year: 'numeric', 
-                hour: '2-digit', minute: '2-digit' 
+            lastUpdatedEl.textContent = now.toLocaleString('en-GB', {
+                day: '2-digit', month: 'short', year: 'numeric',
+                hour: '2-digit', minute: '2-digit'
             });
 
             updateVisitorStats();
@@ -275,16 +273,14 @@
         async function fetchAndParseM3U() {
             const loadingText = document.getElementById('loading-text');
             loadingText.textContent = "Loading playlist...";
-            
+           
             try {
                 const response = await fetch(m3uUrl + '?t=' + Date.now());
                 if (!response.ok) throw new Error('Network error');
-
                 const text = await response.text();
                 const lines = text.split('\n');
                 allChannels = [];
                 let currentChannel = null;
-
                 for (let line of lines) {
                     line = line.trim();
                     if (line.startsWith('#EXTINF')) {
@@ -293,20 +289,18 @@
                         const groupMatch = line.match(/group-title="([^"]*)"/);
                         const category = groupMatch ? groupMatch[1] : "General";
                         currentChannel = { name: name, category: category, url: "" };
-                    } 
+                    }
                     else if (line && !line.startsWith('#') && currentChannel) {
                         currentChannel.url = line;
                         allChannels.push(currentChannel);
                         currentChannel = null;
                     }
                 }
-
                 renderSidebar();
                 document.getElementById('search-input').addEventListener('input', () => {
                     renderSidebar(document.getElementById('search-input').value.trim());
                 });
                 loadingText.style.display = 'none';
-
             } catch (error) {
                 console.error(error);
                 loadingText.innerHTML = '<span style="color:red;">Failed to load playlist</span>';
@@ -319,15 +313,12 @@
             const keyword = filterKeyword.toLowerCase();
             const favChannels = allChannels.filter(c => favoriteChannelUrls.includes(c.url));
             const groupedChannels = {};
-
             allChannels.forEach(channel => {
                 if (keyword && !channel.name.toLowerCase().includes(keyword)) return;
                 if (!groupedChannels[channel.category]) groupedChannels[channel.category] = [];
                 groupedChannels[channel.category].push(channel);
             });
-
             const shouldExpandAll = keyword !== "";
-
             if (allChannels.length > 0 && !keyword) {
                 createCategorySection("🌐 All Channels", allChannels, false, "all-header");
             }
@@ -337,13 +328,11 @@
                     createCategorySection("⭐ Favorites", filteredFavs, false, "fav-header");
                 }
             }
-
             Object.keys(groupedChannels).forEach(categoryName => {
                 if (groupedChannels[categoryName].length > 0) {
                     createCategorySection(categoryName, groupedChannels[categoryName], shouldExpandAll);
                 }
             });
-
             if (container.children.length === 0) {
                 container.innerHTML = '<div style="padding: 20px; color: #888; text-align: center;">No channels found!</div>';
             }
@@ -354,20 +343,18 @@
             headerBtn.className = 'zoom-category-header';
             if (specialClass) headerBtn.classList.add(specialClass);
             headerBtn.innerHTML = `<i class="fa-solid fa-chevron-right arrow"></i> <i class="fa-regular fa-folder"></i> ${categoryName} (${channels.length})`;
-            
+           
             const subListUl = document.createElement('ul');
             subListUl.className = 'zoom-channel-sublist';
             if (isExpandedByDefault) {
                 headerBtn.classList.add('expanded');
                 subListUl.classList.add('show');
             }
-
             channels.forEach((channel) => {
                 const li = document.createElement('li');
                 li.className = 'channel-item';
                 const firstLetter = channel.name.charAt(0).toUpperCase();
                 const isStarred = favoriteChannelUrls.includes(channel.url);
-
                 li.innerHTML = `
                     <div class="channel-icon">${firstLetter}</div>
                     <div style="flex: 1; padding-right: 30px;">${channel.name}</div>
@@ -375,7 +362,6 @@
                         <i class="${isStarred ? 'fa-solid' : 'fa-regular'} fa-star"></i>
                     </button>
                 `;
-
                 li.addEventListener('click', (e) => {
                     if (e.target.closest('.fav-star-btn')) return;
                     document.querySelectorAll('.channel-item').forEach(el => el.classList.remove('active'));
@@ -383,7 +369,6 @@
                     player.src({ src: channel.url, type: 'application/x-mpegURL' });
                     player.play().catch(() => {});
                 });
-
                 const starBtn = li.querySelector('.fav-star-btn');
                 starBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -395,10 +380,8 @@
                     localStorage.setItem('fav_channels', JSON.stringify(favoriteChannelUrls));
                     renderSidebar(document.getElementById('search-input').value.trim());
                 });
-
                 subListUl.appendChild(li);
             });
-
             headerBtn.addEventListener('click', () => {
                 const isExpanded = headerBtn.classList.contains('expanded');
                 if (isExpanded) {
@@ -409,7 +392,6 @@
                     subListUl.classList.add('show');
                 }
             });
-
             const container = document.getElementById('zoom-sidebar-container');
             container.appendChild(headerBtn);
             container.appendChild(subListUl);
