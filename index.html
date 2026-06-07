@@ -21,17 +21,18 @@
       width: 100%; 
       background: black; 
     }
+    .controls { 
+      text-align: center; 
+      margin: 15px; 
+    }
     input, button, select { 
       padding: 10px; 
       margin: 5px; 
     }
     select { 
-      width: 500px; 
+      width: 520px; 
     }
-    .controls { 
-      text-align: center; 
-      margin: 15px; 
-    }
+    #status { color: #0f0; margin: 10px; font-size: 14px; }
   </style>
 </head>
 <body>
@@ -42,24 +43,27 @@
   </div>
 
   <div class="controls">
-    <input type="text" id="playlistUrl" placeholder="Enter M3U Playlist URL" style="width:450px;" value="https://iptv-org.github.io/iptv/index.m3u">
+    <input type="text" id="playlistUrl" placeholder="Enter M3U URL (optional)" style="width:450px;" value="playlist.m3u">
     <button onclick="loadPlaylist()">Load Playlist</button>
     <br><br>
-    <select id="channelList" size="18" onchange="playChannel(this.value)"></select>
+    <div id="status">Loading playlist...</div>
+    <select id="channelList" size="20" onchange="playChannel(this.value)"></select>
   </div>
 
   <script>
     let hls;
     const video = document.getElementById('video');
+    const status = document.getElementById('status');
 
-    async function loadPlaylist() {
-      const url = document.getElementById('playlistUrl').value.trim();
-      if (!url) return alert("Please enter a playlist URL");
-
+    async function loadPlaylist(customUrl = null) {
+      const url = customUrl || document.getElementById('playlistUrl').value.trim() || 'playlist.m3u';
+      
+      status.textContent = "Loading channels...";
+      
       try {
         const res = await fetch(url);
-        if (!res.ok) throw new Error("Failed to load playlist");
-        
+        if (!res.ok) throw new Error("Load failed");
+
         const text = await res.text();
         const channels = [];
         const lines = text.split('\n');
@@ -67,7 +71,7 @@
 
         for (let line of lines) {
           if (line.startsWith('#EXTINF')) {
-            current.name = line.split(',').pop().trim();
+            current.name = line.split(',').pop().trim() || "Unknown Channel";
           } else if (line && !line.startsWith('#') && current.name) {
             current.url = line.trim();
             channels.push({name: current.name, url: current.url});
@@ -83,24 +87,32 @@
           opt.textContent = ch.name;
           select.appendChild(opt);
         });
+
+        status.textContent = `✅ Loaded ${channels.length} channels`;
+        
       } catch (e) {
-        alert("Error loading playlist: " + e.message);
+        status.textContent = "❌ Error loading playlist";
+        console.error(e);
       }
     }
 
     function playChannel(url) {
       if (!url) return;
       
-      if (hls) {
-        hls.destroy();
-        hls = null;
-      }
-
+      if (hls) hls.destroy();
+      
       if (Hls.isSupported()) {
         hls = new Hls();
         hls.loadSource(url);
         hls.attachMedia(video);
-      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = url;
       } else {
         video.src = url;
+      }
+      video.play().catch(() => {});
+    }
+
+    // Auto load playlist.m3u when page opens
+    window.onload = loadPlaylist;
+  </script>
+</body>
+</html>
