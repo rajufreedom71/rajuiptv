@@ -41,7 +41,7 @@
       player.controlBar.addChild('HttpSourceSelector');
     });
 
-    // Playlist থেকে অটোলোড (playlist.m3u ফাইল fetch করে চ্যানেল লিস্ট বানানো)
+    // Load playlist.m3 file
     fetch('playlist.m3u')
       .then(response => response.text())
       .then(data => {
@@ -50,17 +50,15 @@
         let currentName = '';
         lines.forEach(line => {
           if (line.startsWith('#EXTINF')) {
-            // চ্যানেলের নাম বের করা
             const nameMatch = line.match(/,(.*)$/);
             if (nameMatch) currentName = nameMatch[1].trim();
           } else if (line.startsWith('http')) {
-            // সার্ভার লিঙ্ক যোগ করা
             if (!channels[currentName]) channels[currentName] = [];
             channels[currentName].push(line.trim());
           }
         });
 
-        // Dropdown এ চ্যানেল + সার্ভার যোগ করা
+        // Populate dropdown
         const select = document.getElementById('channelSelect');
         Object.keys(channels).forEach(name => {
           channels[name].forEach((url, index) => {
@@ -71,13 +69,13 @@
           });
         });
 
-        // প্রথম চ্যানেল লোড করা
+        // Load first channel
         if (select.options.length > 0) {
           player.src({ src: select.options[0].value, type: 'application/x-mpegURL' });
           player.play();
         }
 
-        // চ্যানেল পরিবর্তন করলে নতুন লিঙ্ক লোড হবে
+        // Change channel on selection
         select.addEventListener('change', function() {
           player.src({ src: this.value, type: 'application/x-mpegURL' });
           player.play();
