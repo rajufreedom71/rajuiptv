@@ -84,7 +84,6 @@
             color: #ffffff;
             font-size: 14px;
             outline: none;
-            transition: border-color 0.2s;
         }
         .search-input:focus {
             border-color: #f5b041;
@@ -119,7 +118,6 @@
             align-items: center;
             gap: 10px;
             border-bottom: 1px solid #1f2633;
-            transition: background 0.2s, color 0.2s;
         }
         .zoom-category-header:hover {
             background-color: #242c3d;
@@ -138,12 +136,8 @@
         .zoom-category-header.expanded i.arrow {
             transform: rotate(90deg);
         }
-        .all-header {
-            color: #00ffcc !important;
-        }
-        .fav-header {
-            color: #ffcc00 !important;
-        }
+        .all-header { color: #00ffcc !important; }
+        .fav-header { color: #ffcc00 !important; }
         .zoom-channel-sublist {
             list-style: none;
             display: none;
@@ -174,7 +168,6 @@
             color: #f5b041;
             font-weight: bold;
             border-left: 3px solid #f5b041;
-            box-shadow: inset 5px 0 10px rgba(245, 176, 65, 0.05);
         }
         .channel-icon {
             width: 24px;
@@ -189,10 +182,6 @@
             font-weight: bold;
             color: #fff;
         }
-        .channel-item.active .channel-icon {
-            background-color: #f5b041;
-            color: #11141a;
-        }
         .fav-star-btn {
             position: absolute;
             right: 20px;
@@ -206,29 +195,33 @@
         .fav-star-btn.starred {
             color: #ffcc00 !important;
         }
+
+        /* Mobile Fix */
         @media (max-width: 768px) {
+            body { overflow: hidden; }
             .main-container {
                 flex-direction: column;
                 height: auto;
-                overflow: visible;
             }
             .player-section {
                 order: 1;
                 flex: none;
-                width: 100%;
-                aspect-ratio: 16 / 9;
-                position: sticky;
-                top: 0;
-                z-index: 100;
-                box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+                height: 40vh;
+                position: relative;
             }
             .playlist-section {
                 order: 2;
                 max-width: 100%;
                 min-width: 100%;
-                flex: none;
+                flex: 1;
                 border-right: none;
                 border-top: 2px solid #242c3d;
+                overflow: hidden;
+            }
+            .zoom-sidebar {
+                flex: 1;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
             }
         }
     </style>
@@ -266,12 +259,9 @@
 
         document.addEventListener("DOMContentLoaded", function() {
             player = videojs('my-video');
-            
             try {
                 player.hlsQualitySelector({ displayCurrentQuality: true });
-            } catch(e) {
-                console.log("Quality selector bypassed");
-            }
+            } catch(e) {}
 
             fetchAndParseM3U();
         });
@@ -372,7 +362,7 @@
                 li.innerHTML = `
                     <div class="channel-icon">${firstLetter}</div>
                     <div style="flex: 1; padding-right: 30px;">${channel.name}</div>
-                    <button class="fav-star-btn ${isStarred ? 'starred' : ''}" title="${isStarred ? 'Remove from Fav' : 'Add to Fav'}">
+                    <button class="fav-star-btn ${isStarred ? 'starred' : ''}">
                         <i class="${isStarred ? 'fa-solid' : 'fa-regular'} fa-star"></i>
                     </button>
                 `;
