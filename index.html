@@ -157,7 +157,7 @@
 
         /* Special Colors for Master Folders */
         .all-header {
-            color: #00ffcc !important;
+            color: #b3c2d4 !important;
         }
         .fav-header {
             color: #ffcc00 !important;
@@ -276,7 +276,33 @@
                 padding: 14px;
             }
         }
-    </style>
+    
+/* Floating Footer */
+#footer-info {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(9, 11, 16, 0.95);
+    border-top: 1px solid #2e384e;
+    color: #b3c2d4;
+    font-size: 12px;
+    padding: 8px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 9999;
+    backdrop-filter: blur(8px);
+}
+#footer-info b { color: #f5b041; }
+@media (max-width: 768px) {
+    #footer-info {
+        font-size: 11px;
+        padding: 7px 10px;
+    }
+}
+
+</style>
 </head>
 <body>
 
@@ -527,5 +553,24 @@
             zoomSidebarContainer.appendChild(subListUl);
         }
     </script>
+
+<div id="footer-info">
+    <span>👥 Total Visitors: <b id="visitor-count">Loading...</b></span>
+    <span>🕒 Last Update: <b>07 Jun 2026</b></span>
+</div>
+
+<script>
+async function loadVisitorCount() {
+    try {
+        const response = await fetch('https://api.countapi.xyz/hit/freeiptvbyraju/visits');
+        const data = await response.json();
+        document.getElementById('visitor-count').textContent = data.value.toLocaleString();
+    } catch (e) {
+        document.getElementById('visitor-count').textContent = 'N/A';
+    }
+}
+loadVisitorCount();
+</script>
+
 </body>
 </html>
