@@ -4,13 +4,15 @@
   <meta charset="utf-8">
   <title>Free IPTV by RAJU</title>
   <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
-  <link href="https://cdn.jsdelivr.net/npm/videojs-http-source-selector@1.1.7/dist/videojs-http-source-selector.css" rel="stylesheet" />
 </head>
 <body>
 
   <h2 style="text-align:center;">Free IPTV by RAJU</h2>
 
-  <select id="channelSelect"></select>
+  <select id="channelSelect">
+    <option value="https://owrcovcrpy.gpcdn.net/bpk-tv/1709/output/index.m3u8">BTV National</option>
+    <option value="https://tvsen6.aynaott.com/channeli/index.m3u8?e=1780495063&token=b461fef067049d465806406d979b57b1">Channel I</option>
+  </select>
 
   <video
     id="my-video"
@@ -18,88 +20,26 @@
     controls
     preload="auto"
     width="640"
-    height="360"
-    data-setup='{}'>
-    <source src="" type="application/x-mpegURL" />
+    height="360">
   </video>
 
-  <div id="epgContainer" style="margin-top:20px; border:1px solid #ccc; padding:10px;">
-    <h3>Program Guide</h3>
-    <ul id="epgList"></ul>
-  </div>
-
   <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/videojs-http-source-selector@1.1.7/dist/videojs-http-source-selector.min.js"></script>
-
   <script>
     var player = videojs('my-video');
-    player.httpSourceSelector();
-    player.on('ready', function() {
-      player.controlBar.addChild('HttpSourceSelector');
-    });
 
-    // Load playlist.m3u
-    fetch('playlist.m3u')
-      .then(response => response.text())
-      .then(data => {
-        const lines = data.split('\n');
-        const channels = {};
-        let currentName = '';
-        lines.forEach(line => {
-          if (line.startsWith('#EXTINF')) {
-            const nameMatch = line.match(/,(.*)$/);
-            if (nameMatch) currentName = nameMatch[1].trim();
-          } else if (line.startsWith('http') && line.includes('.m3u8')) {
-            if (!channels[currentName]) channels[currentName] = [];
-            channels[currentName].push(line.trim());
-          }
-        });
-
-        const select = document.getElementById('channelSelect');
-        Object.keys(channels).forEach(name => {
-          channels[name].forEach((url, index) => {
-            const option = document.createElement('option');
-            option.value = url;
-            option.text = name + " - Server " + (index+1);
-            select.appendChild(option);
-          });
-        });
-
-        if (select.options.length > 0) {
-          player.src({ src: select.options[0].value, type: 'application/x-mpegURL' });
-          player.play();
-          loadEPG(select.options[0].text.split(" - ")[0]);
-        }
-
-        select.addEventListener('change', function() {
-          player.src({ src: this.value, type: 'application/x-mpegURL' });
-          player.play();
-          const selectedChannel = this.options[this.selectedIndex].text.split(" - ")[0];
-          loadEPG(selectedChannel);
-        });
-      });
-
-    // Example EPG XML file (replace with your source)
-    const epgUrl = "https://iptv-org.github.io/epg/guides.xml";
-
-    function loadEPG(channelName) {
-      fetch(epgUrl)
-        .then(response => response.text())
-        .then(str => (new window.DOMParser()).parseFromString(str, "text/xml"))
-        .then(data => {
-          const programmes = data.querySelectorAll(`programme[channel="${channelName}"]`);
-          const epgList = document.getElementById("epgList");
-          epgList.innerHTML = "";
-          programmes.forEach(prog => {
-            const start = prog.getAttribute("start");
-            const stop = prog.getAttribute("stop");
-            const title = prog.querySelector("title")?.textContent || "No Title";
-            const li = document.createElement("li");
-            li.textContent = `${start} - ${stop}: ${title}`;
-            epgList.appendChild(li);
-          });
-        });
+    const select = document.getElementById('channelSelect');
+    function loadChannel(url) {
+      player.src({ src: url, type: 'application/x-mpegURL' });
+      player.play();
     }
+
+    // Load first channel
+    loadChannel(select.value);
+
+    // Change channel
+    select.addEventListener('change', function() {
+      loadChannel(this.value);
+    });
   </script>
 
 </body>
