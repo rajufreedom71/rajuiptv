@@ -1,6 +1,6 @@
 #EXTM3U#EXTM3U
-#EXTINF:-1 tvg-id="T_sports" tvg-name="T Sports" tvg-logo="https://i.ibb.co.com/h1Wvy09C/1000283988.png" group-title="FIFA",T Sports/Bein Sports
-http://go8knm.optikl.ink/X/index.php/Besyria2/video.m3u8
+#EXTINF:-1 tvg-id="T_sports" tvg-name="T Sports" tvg-logo="https://i.ibb.co.com/h1Wvy09C/1000283988.png" group-title="FIFA",T Sports/nowtv
+http://182.48.93.238:8080/live/screen.m3u8
 
 #EXTINF:-1 tvg-id="PTV_Sports" tvg-name="PTV Sports" tvg-logo="https://i.ibb.co.com/dsvVDJZs/1000284021.png" group-title="FIFA",PTV Sports/z Bangla Sonar
 203.18.159.180/t.me/BDIX_Bypass_josh_Rambo_join_now_nrtdffg425ds/index.m3u8
