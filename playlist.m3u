@@ -1,17 +1,10 @@
 #EXTM3U#EXTM3U
-#PLAYLIST: FIFA BDIX
-#EXTENC: UTF-8
-
-
-
-#EXTINF:-1 tvg-id="Caze_TV" tvg-name="Caze TV" tvg-logo="https://i.ibb.co.com/9JJ04g9/1000284076.png" group-title="FIFA",Caze TV
-https://dfr80qz435crc.cloudfront.net/MNOP/Amagi/Caze/Caze_TV_BR/1080p-vtt/index.m3u8
-
 #EXTINF:-1 tvg-id="T_sports" tvg-name="T Sports" tvg-logo="https://i.ibb.co.com/h1Wvy09C/1000283988.png" group-title="FIFA",T Sports
 https://amitomar.bdixbd.net/hoichoi.pro1/tracks-v1a1/index.m3u8
 
 #EXTINF:-1 tvg-id="PTV_Sports" tvg-name="PTV Sports" tvg-logo="https://i.ibb.co.com/dsvVDJZs/1000284021.png" group-title="FIFA",PTV Sports
 https://tvsen5.aynaott.com/PtvSports/index.m3u8
+
 #EXTINF:-1 tvg-name="T Sports HD" group-title="Sports",T Sports HD
 https://tvsen7.aynaott.com/tsports-hd/index.m3u8?e=1780495065&u=78be6644-0a65-48ec-81a4-089ac65a2619&token=10dbb0908b5515dec860bbca9d40fc09
 #EXTINF:-1 tvg-name="A SPORTS HD" group-title="Sports",A SPORTS HD
@@ -2182,21 +2175,3 @@ https://owrcovcrpy.gpcdn.net/bpk-tv/1724/output/1724.m3u8
 https://cdn-globecast.akamaized.net/live/eds/saudi_quran/hls_roku/index.m3u8
 #EXTINF:-1 tvg-name="Makka live" tvg-logo="https://bugsfreeweb.github.io/LiveTVCollector/BugsfreeLogo/default-logo.png" group-title="Religious",Makka live
 https://cdn-globecast.akamaized.net/live/eds/saudi_sunnah/hls_roku/index.m3u8
-
-
-
-#EXTM3U
-#PLAYLIST: FIFA BDIX
-#EXTENC: UTF-8
-
-
-
-#EXTINF:-1 tvg-id="Caze_TV" tvg-name="Caze TV" tvg-logo="https://i.ibb.co.com/9JJ04g9/1000284076.png" group-title="FIFA",Caze TV
-https://dfr80qz435crc.cloudfront.net/MNOP/Amagi/Caze/Caze_TV_BR/1080p-vtt/index.m3u8
-
-#EXTINF:-1 tvg-id="T_sports" tvg-name="T Sports" tvg-logo="https://i.ibb.co.com/h1Wvy09C/1000283988.png" group-title="FIFA",T Sports
-http://103.151.61.12/T-Sports.kutta/video.m3u8
-
-#EXTINF:-1 tvg-id="PTV_Sports" tvg-name="PTV Sports" tvg-logo="https://i.ibb.co.com/dsvVDJZs/1000284021.png" group-title="FIFA",PTV Sports
-https://tvsen5.aynaott.com/PtvSports/index.m3u8
-
