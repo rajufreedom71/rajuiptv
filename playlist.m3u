@@ -13,6 +13,56 @@ http://84.17.50.102/fox/index.m3u8
 https://bl.video.matchtv.ru/media/playlist/free_d46d0cf1712c0542ec7fd4f0808f600a_hd/17_89756005/1080/e6bef86de8a133cd7b27deb040758a00/4796141934.m3u8
 
 
+#EXTINF:-1 tvg-name="Sports" group-title="FIFA | Live Sports",Fox
+http://84.17.50.102/fox/index.m3u8
+
+#EXTINF:-1 tvg-name="Sports" group-title="FIFA | Live Sports",Tapmad
+https://premierleagpl23.akamaized.net/hls/live/2107108/tapmad-P2s6L_FiN@L-UrU/master.m3u8
+
+#EXTINF:-1 tvg-name="Sports" group-title="FIFA | Live Sports",Tv Azteca
+https://1nyaler.streamhostingcdn.top/stream/117/index.m3u8
+
+#EXTINF:-1 tvg-name="Sports" group-title="FIFA | Live Sports",Tudn⤵
+https://1nyaler.streamhostingcdn.top/stream/52/index.m3u8
+
+#EXTINF:-1 tvg-name="Sports" group-title="FIFA | Live Sports"Tyc
+https://1nyaler.streamhostingcdn.top/stream/84/index.m3u8
+
+#EXTINF:-1 tvg-name="Sports" group-title="FIFA | Live Sports",D sports
+https://1nyaler.streamhostingcdn.top/stream/106/index.m3u8
+
+#EXTINF:-1 tvg-name="Sports" group-title="FIFA | Live Sports",Tvp
+https://1nyaler.streamhostingcdn.top/stream/89/index.m3u8
+
+#EXTINF:-1 tvg-name="Sports" group-title="FIFA | Live Sports",Dazn
+https://1nyaler.streamhostingcdn.top/stream/94/index.m3u8
+
+#EXTINF:-1 tvg-name="Sports" group-title="FIFA | Live Sports",Bein
+https://1nyaler.streamhostingcdn.top/stream/23/index.m3u8
+
+
+#EXTINF:-1 tvg-name="Sports" group-title="FIFA | Live Sports",Win 
+https://1nyaler.streamhostingcdn.top/stream/32/index.m3u8
+
+#EXTINF:-1 tvg-name="Sports" group-title="FIFA | Live Sports",Somoy Tv
+http://114.130.57.224:8080/Somoy-TV-3Mb/tracks-v1a1/mono.m3u8?token=SkQuhAXZxgBan1
+
+#EXTINF:-1 tvg-name="Sports" group-title="FIFA | Live Sports",Ptv
+http://198.195.239.50:8095/ptv/tracks-v1a1/mono.m3u8
+
+#EXTINF:-1 tvg-name="Sports" group-title="FIFA | Live Sports",T sports 
+http://198.195.239.50:8095/tsports/tracks-v1a1/mono.m3u8
+
+#EXTINF:-1 tvg-name="Sports" group-title="FIFA | Live Sports",Zee bangla shonar 
+http://203.18.159.180/t.me/BDIX_Bypass_josh_Rambo_live1sdfddjgjj/index.m3u8
+
+
+
+
+
+
+
+
 
 
 
