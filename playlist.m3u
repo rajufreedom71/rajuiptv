@@ -1,15 +1,21 @@
 #EXTM3U#EXTM3U
-#EXTINF:-1 tvg-id="T_sports" tvg-name="T Sports" tvg-logo="https://i.ibb.co.com/h1Wvy09C/1000283988.png" group-title="FIFA|Live Sports",Win Sports
+#EXTINF:-1 tvg-id="T_sports" tvg-name="T Sports" tvg-logo="https://i.ibb.co.com/h1Wvy09C/1000283988.png" group-title="FIFA | Live Sports",Win Sports
 https://1nyaler.streamhostingcdn.top/stream/32/index.m3u8
 
-#EXTINF:-1 tvg-id="T_sports" tvg-name="T Sports" tvg-logo="https://i.ibb.co.com/h1Wvy09C/1000283988.png" group-title="FIFA|Live Sports",T Sports HD
+#EXTINF:-1 tvg-id="T_sports" tvg-name="T Sports" tvg-logo="https://i.ibb.co.com/h1Wvy09C/1000283988.png" group-title="FIFA | Live Sports",T Sports HD
 http://198.195.239.50:8095/tsports/tracks-v1a1/mono.m3u8
 
-#EXTINF:-1 tvg-id="PTV_Sports" tvg-name="PTV Sports" tvg-logo="https://i.ibb.co.com/dsvVDJZs/1000284021.png" group-title="FIFA|Live Sports",Bein Sports 1
+#EXTINF:-1 tvg-id="PTV_Sports" tvg-name="PTV Sports" tvg-logo="https://i.ibb.co.com/dsvVDJZs/1000284021.png" group-title="FIFA | Live Sports",Bein Sports 1
 https://1nyaler.streamhostingcdn.top/stream/23/index.m3u8
 
-#EXTINF:-1 tvg-id="PTV_Sports" tvg-name="PTV Sports" tvg-logo="https://i.ibb.co.com/dsvVDJZs/1000284021.png" group-title="FIFA|Live Sports",Win Sports 4k
+#EXTINF:-1 tvg-id="PTV_Sports" tvg-name="PTV Sports" tvg-logo="https://i.ibb.co.com/dsvVDJZs/1000284021.png" group-title="FIFA | Live Sports",Win Sports 4k
 https://1nyaler.streamhostingcdn.top/stream/32/index.m3u8
+
+#EXTINF:-1 tvg-name="Sports" group-title="FIFA | Live Sports",Fox Sports
+http://84.17.50.102/fox/index.m3u8
+
+#EXTINF:-1 tvg-name="Sports" group-title="FIFA | Live Sports",Match ru
+https://bl.video.matchtv.ru/media/playlist/free_d46d0cf1712c0542ec7fd4f0808f600a_hd/17_89756005/1080/e6bef86de8a133cd7b27deb040758a00/4796141934.m3u8
 
 
 
