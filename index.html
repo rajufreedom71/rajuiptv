@@ -245,6 +245,27 @@
         .fav-star-btn:hover { color: #ffcc00; transform: scale(1.2); }
         .fav-star-btn.starred { color: #ffcc00 !important; }
 
+        .vjs-pip-button {
+            cursor: pointer;
+        }
+
+        /* Data Usage Overlay */
+        .vjs-data-usage {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0,0,0,0.6);
+            color: #b3c2d4;
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            z-index: 50;
+            pointer-events: none;
+            font-family: monospace;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
         .vjs-quality-button {
             position: relative;
             cursor: pointer;
@@ -360,6 +381,10 @@
         let qualityLevels = null;
         let qButton = null;
         let qMenu = null;
+        let currentBitrate = 0;
+        let dataUsedBytes = 0;
+        let dataInterval = null;
+        let dataLabel = null;
 
         function buildQualityMenu() {
             if (!qualityLevels || qualityLevels.length === 0) return;
@@ -375,6 +400,11 @@
                 qMenu.style.display = 'none';
                 qMenu.querySelectorAll('.vjs-quality-menu-item').forEach(function(el) { el.classList.remove('active'); });
                 this.classList.add('active');
+                var maxB = 0;
+                for (var bi = 0; bi < qualityLevels.length; bi++) {
+                    if (qualityLevels[bi].bitrate > maxB) maxB = qualityLevels[bi].bitrate;
+                }
+                currentBitrate = maxB;
             });
             qMenu.appendChild(autoItem);
 
@@ -392,6 +422,7 @@
                         qMenu.style.display = 'none';
                         qMenu.querySelectorAll('.vjs-quality-menu-item').forEach(function(el) { el.classList.remove('active'); });
                         this.classList.add('active');
+                        currentBitrate = level.bitrate || 0;
                     });
                     qMenu.appendChild(item);
                 })(i);
@@ -426,6 +457,20 @@
 
                 fsEl.parentNode.insertBefore(wrapper, fsEl);
 
+                var videoEl = player.el().querySelector('video');
+                var pipBtn = document.createElement('button');
+                pipBtn.className = 'vjs-control vjs-button vjs-pip-button';
+                pipBtn.innerHTML = '<span class="vjs-icon-placeholder"><i class="fa-solid fa-up-right-and-down-left-from-center"></i></span>';
+                pipBtn.title = 'Picture-in-Picture';
+                pipBtn.addEventListener('click', function() {
+                    if (document.pictureInPictureElement) {
+                        document.exitPictureInPicture();
+                    } else if (videoEl && videoEl.requestPictureInPicture) {
+                        videoEl.requestPictureInPicture();
+                    }
+                });
+                fsEl.parentNode.insertBefore(pipBtn, fsEl);
+
                 qButton.addEventListener('click', function(e) {
                     e.stopPropagation();
                     qMenu.style.display = qMenu.style.display === 'block' ? 'none' : 'block';
@@ -434,13 +479,44 @@
                 document.addEventListener('click', function() { qMenu.style.display = 'none'; });
                 qMenu.addEventListener('click', function(e) { e.stopPropagation(); });
 
+                dataLabel = document.createElement('div');
+                dataLabel.className = 'vjs-data-usage';
+                dataLabel.textContent = '0.0 MB';
+                player.el().appendChild(dataLabel);
+
+                function updateDataUsage() {
+                    var bitsPerSec = currentBitrate;
+                    if (bitsPerSec > 0) {
+                        dataUsedBytes += bitsPerSec / 8;
+                    }
+                    var mb = (dataUsedBytes / (1024 * 1024)).toFixed(1);
+                    dataLabel.textContent = mb + ' MB';
+                }
+
                 player.on('loadedmetadata', function() {
                     qualityLevels = player.qualityLevels();
                     if (qualityLevels && qualityLevels.length > 0) {
                         setTimeout(buildQualityMenu, 300);
+                        var maxBitrate = 0;
+                        for (var bi = 0; bi < qualityLevels.length; bi++) {
+                            if (qualityLevels[bi].bitrate > maxBitrate)
+                                maxBitrate = qualityLevels[bi].bitrate;
+                        }
+                        currentBitrate = maxBitrate;
                     } else {
                         qualityLevels = null;
+                        currentBitrate = 0;
                     }
+                    dataUsedBytes = 0;
+                    if (dataInterval) clearInterval(dataInterval);
+                    dataInterval = setInterval(updateDataUsage, 1000);
+                });
+
+                player.on('pause', function() {
+                    if (dataInterval) { clearInterval(dataInterval); dataInterval = null; }
+                });
+                player.on('play', function() {
+                    if (!dataInterval) dataInterval = setInterval(updateDataUsage, 1000);
                 });
             });
 
