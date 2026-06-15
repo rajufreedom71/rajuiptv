@@ -245,10 +245,6 @@
         .fav-star-btn:hover { color: #ffcc00; transform: scale(1.2); }
         .fav-star-btn.starred { color: #ffcc00 !important; }
 
-        .vjs-pip-button {
-            cursor: pointer;
-        }
-
         /* Data Usage Overlay */
         .vjs-data-usage {
             position: absolute;
@@ -381,7 +377,7 @@
         let qualityLevels = null;
         let qButton = null;
         let qMenu = null;
-        let currentBitrate = 0;
+        let knownUrls = {};
         let dataUsedBytes = 0;
         let dataInterval = null;
         let dataLabel = null;
@@ -400,11 +396,6 @@
                 qMenu.style.display = 'none';
                 qMenu.querySelectorAll('.vjs-quality-menu-item').forEach(function(el) { el.classList.remove('active'); });
                 this.classList.add('active');
-                var maxB = 0;
-                for (var bi = 0; bi < qualityLevels.length; bi++) {
-                    if (qualityLevels[bi].bitrate > maxB) maxB = qualityLevels[bi].bitrate;
-                }
-                currentBitrate = maxB;
             });
             qMenu.appendChild(autoItem);
 
@@ -422,7 +413,6 @@
                         qMenu.style.display = 'none';
                         qMenu.querySelectorAll('.vjs-quality-menu-item').forEach(function(el) { el.classList.remove('active'); });
                         this.classList.add('active');
-                        currentBitrate = level.bitrate || 0;
                     });
                     qMenu.appendChild(item);
                 })(i);
@@ -457,20 +447,6 @@
 
                 fsEl.parentNode.insertBefore(wrapper, fsEl);
 
-                var videoEl = player.el().querySelector('video');
-                var pipBtn = document.createElement('button');
-                pipBtn.className = 'vjs-control vjs-button vjs-pip-button';
-                pipBtn.innerHTML = '<span class="vjs-icon-placeholder"><i class="fa-solid fa-up-right-and-down-left-from-center"></i></span>';
-                pipBtn.title = 'Picture-in-Picture';
-                pipBtn.addEventListener('click', function() {
-                    if (document.pictureInPictureElement) {
-                        document.exitPictureInPicture();
-                    } else if (videoEl && videoEl.requestPictureInPicture) {
-                        videoEl.requestPictureInPicture();
-                    }
-                });
-                fsEl.parentNode.insertBefore(pipBtn, fsEl);
-
                 qButton.addEventListener('click', function(e) {
                     e.stopPropagation();
                     qMenu.style.display = qMenu.style.display === 'block' ? 'none' : 'block';
@@ -485,10 +461,18 @@
                 player.el().appendChild(dataLabel);
 
                 function updateDataUsage() {
-                    var bitsPerSec = currentBitrate;
-                    if (bitsPerSec > 0) {
-                        dataUsedBytes += bitsPerSec / 8;
-                    }
+                    try {
+                        var entries = performance.getEntriesByType('resource');
+                        var totalBytes = 0;
+                        for (var ei = 0; ei < entries.length; ei++) {
+                            var e = entries[ei];
+                            if (e.transferSize > 0 && !knownUrls[e.name]) {
+                                knownUrls[e.name] = true;
+                                totalBytes += e.transferSize;
+                            }
+                        }
+                    } catch (e) { totalBytes = 0; }
+                    if (totalBytes > 0) dataUsedBytes += totalBytes;
                     var mb = (dataUsedBytes / (1024 * 1024)).toFixed(1);
                     dataLabel.textContent = mb + ' MB';
                 }
@@ -497,26 +481,18 @@
                     qualityLevels = player.qualityLevels();
                     if (qualityLevels && qualityLevels.length > 0) {
                         setTimeout(buildQualityMenu, 300);
-                        var maxBitrate = 0;
-                        for (var bi = 0; bi < qualityLevels.length; bi++) {
-                            if (qualityLevels[bi].bitrate > maxBitrate)
-                                maxBitrate = qualityLevels[bi].bitrate;
-                        }
-                        currentBitrate = maxBitrate;
                     } else {
                         qualityLevels = null;
-                        currentBitrate = 0;
                     }
-                    dataUsedBytes = 0;
                     if (dataInterval) clearInterval(dataInterval);
-                    dataInterval = setInterval(updateDataUsage, 1000);
+                    dataInterval = setInterval(updateDataUsage, 2000);
                 });
 
                 player.on('pause', function() {
                     if (dataInterval) { clearInterval(dataInterval); dataInterval = null; }
                 });
                 player.on('play', function() {
-                    if (!dataInterval) dataInterval = setInterval(updateDataUsage, 1000);
+                    if (!dataInterval) dataInterval = setInterval(updateDataUsage, 2000);
                 });
             });
 
