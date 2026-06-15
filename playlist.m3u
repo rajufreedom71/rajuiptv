@@ -14,8 +14,8 @@ https://1nyaler.streamhostingcdn.top/stream/32/index.m3u8
 https://1nyaler.streamhostingcdn.top/stream/23/index.m3u8
 #EXTINF:-1 tvg-name="Dazn Direct" tvg-logo="https://imglink.cc/cdn/RY7jBwPKAr.jpg" group-title="FIFA | Live Sports",Dazn Direct
 https://1nyaler.streamhostingcdn.top/stream/94/index.m3u8
-#EXTINF:-1 tvg-name="TVP Sports" tvg-logo="https://imglink.cc/cdn/RY7jBwPKAr.jpg" group-title="FIFA | Live Sports",TVP Sports
-https://1nyaler.streamhostingcdn.top/stream/89/index.m3u8
+#EXTINF:-1 tvg-name="TVP Sports" tvg-logo="https://imglink.cc/cdn/RY7jBwPKAr.jpg" group-title="FIFA | Live Sports",T Sports
+http://198.195.239.50:8095/tsports/tracks-v1a1/mono.m3u8
 #EXTINF:-1 tvg-name="D Sports" tvg-logo="https://imglink.cc/cdn/RY7jBwPKAr.jpg" group-title="FIFA | Live Sports",D Sports
 https://1nyaler.streamhostingcdn.top/stream/106/index.m3u8
 #EXTINF:-1 tvg-name="TYC Sports" tvg-logo="https://imglink.cc/cdn/RY7jBwPKAr.jpg" group-title="FIFA | Live Sports",TYC Sports
@@ -24,6 +24,13 @@ https://1nyaler.streamhostingcdn.top/stream/84/index.m3u8
 https://1nyaler.streamhostingcdn.top/stream/117/index.m3u8
 #EXTINF:-1 tvg-name="Tudn Sports 🇲🇽" tvg-logo="https://imglink.cc/cdn/RY7jBwPKAr.jpg" group-title="FIFA | Live Sports",Tudn Sports 🇲🇽
 
+#EXTINF:-1 tvg-name="Bein Sports" group-title="FIFA | Live Sports",Somoy tv
+https://live.thebosstv.com:30443/dwlive/Somoy-TV/playlist.m3u8
+#EXTINF:-1 tvg-name="Bein Sports" group-title="FIFA | Live Sports",Bein Sports 5
+http://starhub.pro/live/farhat-3379/67897-913379/744523.ts
+#EXTINF:-1 tvg-name="Bein Sports" group-title="FIFA | Live Sports",
+#EXTINF:-1 tvg-name="Bein Sports" group-title="FIFA | Live Sports",
+#EXTINF:-1 tvg-name="Bein Sports" group-title="FIFA | Live Sports",
 
 
 
